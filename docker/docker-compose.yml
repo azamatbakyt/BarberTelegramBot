@@ -1,0 +1,18 @@
+version: '3.1'
+
+volumes:
+  barber_project:
+
+
+services:
+  pg_db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=barber_db
+    volumes:
+      - barber_project:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"

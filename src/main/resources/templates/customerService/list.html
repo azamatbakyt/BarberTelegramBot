@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Duration</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="service : ${services}">
+        <td th:text="${service.getId()}"></td>
+        <td th:text="${service.getName()}"></td>
+        <td th:text="${service.getPrice()}"></td>
+        <td th:text="${service.getDuration()}"></td>
+        <td>
+            <a th:href="${'/services/' + service.id }">Service</a>
+            <a th:href="${'/services/' + service.id + '/delete'}">Delete</a>
+        </td>
+
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
