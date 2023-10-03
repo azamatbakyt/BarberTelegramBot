@@ -24,10 +24,15 @@
         <td>
             <a th:href="${'/services/' + service.id }">Service</a>
             <a th:href="${'/services/' + service.id + '/delete'}">Delete</a>
+            <a th:href="${'/services/' + service.id + '/edit'}">Edit</a>
         </td>
 
     </tr>
     </tbody>
 </table>
+<br/>
+<hr/>
+
+<a th:href="${'/services/new'}">Create a service</a>
 </body>
 </html>

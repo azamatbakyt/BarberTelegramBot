@@ -1,7 +1,6 @@
 package kz.azamatbakyt.BarberTelegramBot.service;
 
 
-
 import com.vdurmont.emoji.EmojiParser;
 import kz.azamatbakyt.BarberTelegramBot.customerServices.*;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceRepository;
@@ -107,16 +106,21 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             } else if (callbackData.equals(String.valueOf(Services.SHAVING))) {
                 choiceShaving(chatId, messageId);
-            } else if (callbackData.equals(String.valueOf(Services.OTHERS))) {
-                choiceOthers(chatId, messageId);
-            } else if (callbackData.equals(String.valueOf(Services.COMPLEX))) {
+            }
+//            } else if (callbackData.equals(String.valueOf(Services.OTHERS))) {
+//                choiceOthers(chatId, messageId);
+//            }
+            else if (callbackData.equals(String.valueOf(Services.COMPLEX))) {
                 choiceComplex(chatId, messageId);
+            } else if (callbackData.equals(String.valueOf(HaircutServices.MENS_HAIRCUT))) {
+                serviceHaircutMan(chatId, messageId);
+            } else if (callbackData.equals(String.valueOf(ComplexServices.HAIRCUTTING))) {
+                serviceHaircutting(chatId, messageId);
             }
 
         }
 
     }
-
 
     private void sendHelp(long chatId, String helpText) {
         SendMessage sendMessage = new SendMessage();
@@ -128,63 +132,6 @@ public class TelegramBot extends TelegramLongPollingBot {
             System.out.println(e.getMessage());
         }
     }
-
-    private void sendServiceHaircut(long chatId) {
-        SendMessage sendMessage = new SendMessage();
-        String[] haircut = serviceHaircut();
-        sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText("Service name: " + haircut[0] + "\n" +
-                "Service price: " + haircut[1] + "tg\n" +
-                "Service duration: " + haircut[2]);
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private void sendServiceBeard(long chatId) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(String.valueOf(chatId));
-        String[] beard = serviceBeard();
-        sendMessage.setText("Service name: " + beard[0] + "\n" +
-                "Service price: " + beard[1] + "tg\n" +
-                "Service duration: " + beard[2]);
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private void sendServiceCleaningMask(long chatId) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(String.valueOf(chatId));
-        String[] cleaningMask = serviceCleaningMask();
-        sendMessage.setText("Service name:" + cleaningMask[0] + "\n" +
-                "Service price: " + cleaningMask[1] + "tg\n" +
-                "Service duration: " + cleaningMask[2]);
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private void sendServiceHaircutAndCleaningMask(long chatId) {
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(String.valueOf(chatId));
-        String[] haircutAndMask = serviceHaircutAndMask();
-        sendMessage.setText("Service name: " + haircutAndMask[0] + "\n" +
-                "Service price: " + haircutAndMask[1] + "tg\n" +
-                "Service duration: " + haircutAndMask[2]);
-        try {
-            execute(sendMessage);
-        } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
 
     private void startCommandReceived(long chatId, String name) {
         String answer = EmojiParser.parseToUnicode("Hi, " + name + ", nice to meet you!" + "\uD83D\uDE0A");
@@ -244,11 +191,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<InlineKeyboardButton> rowHaircutAndBeard = new ArrayList<>();
 
         InlineKeyboardButton buttonHaircutService = new InlineKeyboardButton();
-        buttonHaircutService.setText("Haircut");
+        buttonHaircutService.setText("Стрижка");
         buttonHaircutService.setCallbackData(String.valueOf(Services.HAIRCUT));
 
         InlineKeyboardButton buttonBeardService = new InlineKeyboardButton();
-        buttonBeardService.setText("Shaving");
+        buttonBeardService.setText("Борода");
         buttonBeardService.setCallbackData(String.valueOf(Services.SHAVING));
 
         rowHaircutAndBeard.add(buttonHaircutService);
@@ -258,11 +205,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<InlineKeyboardButton> rowComplexAndCamouflage = new ArrayList<>();
 
         InlineKeyboardButton buttonComplex = new InlineKeyboardButton();
-        buttonComplex.setText("Complex");
+        buttonComplex.setText("Комплекс");
         buttonComplex.setCallbackData(String.valueOf(Services.COMPLEX));
 
         InlineKeyboardButton buttonCamouflage = new InlineKeyboardButton();
-        buttonCamouflage.setText("Camouflage");
+        buttonCamouflage.setText("Камуфляж");
         buttonCamouflage.setCallbackData(String.valueOf(Services.CAMOUFLAGE));
 
         rowComplexAndCamouflage.add(buttonComplex);
@@ -273,7 +220,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<InlineKeyboardButton> rowOther = new ArrayList<>();
 
         InlineKeyboardButton others = new InlineKeyboardButton();
-        others.setText("Others");
+        others.setText("Другие");
         others.setCallbackData(String.valueOf(Services.OTHERS));
 
         rowOther.add(others);
@@ -287,15 +234,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         return markupInline;
     }
 
+
     private void choiceHaircut(long chatId, long messageId) {
         String text = "Вы выбрали Стрижку. \nДавайте выберем какую именно услугу вы хотите?";
         EditMessageText message = new EditMessageText();
-        String[] haircut = serviceHaircut();
         message.setChatId(String.valueOf(chatId));
-        message.setText(text + "\n" +
-                "Услуга: " + haircut[0] + "\n" +
-                "Стоимость: " + haircut[1] + "тг\n" +
-                "Длительность: " + haircut[2]);
+        message.setText(text);
         message.setMessageId((int) messageId);
         message.setReplyMarkup(haircutInlineKeyboard());
         try {
@@ -381,14 +325,10 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void choiceComplex(long chatId, long messageId) {
         String text = "Вы выбрали Комплекс. \nНа данный момент у меня доступна одна услуга";
         EditMessageText message = new EditMessageText();
-        String[] complex = serviceHaircutAndMask();
         message.setChatId(String.valueOf(chatId));
         message.setMessageId((int) messageId);
-        message.setText(text + "\n" +
-                "Услуга: " + complex[0] + "\n" +
-                "Цена: " + complex[1] + "тг\n" +
-                "Длительность: " + complex[2]);
-        message.setReplyMarkup(compextInlineKeyboard());
+        message.setText(text + "\n");
+        message.setReplyMarkup(complexInlineKeyboard());
         try {
             execute(message);
         } catch (TelegramApiException e) {
@@ -396,15 +336,15 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private InlineKeyboardMarkup compextInlineKeyboard() {
+    private InlineKeyboardMarkup complexInlineKeyboard() {
         InlineKeyboardMarkup markupIn = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-
+        String[] complex = serviceComplex();
         List<InlineKeyboardButton> compexList = new ArrayList<>();
-        InlineKeyboardButton complex = new InlineKeyboardButton();
-        complex.setText("Стрижка+Борода");
-        complex.setCallbackData(String.valueOf(ComplexServices.HAIRCUTTING));
-        compexList.add(complex);
+        InlineKeyboardButton complexBtn = new InlineKeyboardButton();
+        complexBtn.setText("Стрижика+Борода");
+        complexBtn.setCallbackData(String.valueOf(ComplexServices.HAIRCUTTING));
+        compexList.add(complexBtn);
 
         rowsInline.add(compexList);
         markupIn.setKeyboard(rowsInline);
@@ -412,23 +352,23 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
 
-    private void choiceOthers(long chatId, long messageId) {
-        String text = "Вы выбрали Прочее. \nДавайте выберем какую именно услугу вы хотите?";
-        EditMessageText message = new EditMessageText();
-        String[] cleaning = serviceCleaningMask();
-        message.setChatId(String.valueOf(chatId));
-        message.setMessageId((int) messageId);
-        message.setText(text + "\n" +
-                "Услуга: " + cleaning[0] + "\n" +
-                "Цена: " + cleaning[1] + "тг\n" +
-                "Длительность: " + cleaning[2]);
-        message.setReplyMarkup(othersInlineKeyboard());
-        try {
-            execute(message);
-        } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
-        }
-    }
+//    private void choiceOthers(long chatId, long messageId) {
+//        String text = "Вы выбрали Прочее. \nДавайте выберем какую именно услугу вы хотите?";
+//        EditMessageText message = new EditMessageText();
+//        String[] cleaning = serviceCleaningMask();
+//        message.setChatId(String.valueOf(chatId));
+//        message.setMessageId((int) messageId);
+//        message.setText(text + "\n" +
+//                "Услуга: " + cleaning[0] + "\n" +
+//                "Цена: " + cleaning[1] + "тг\n" +
+//                "Длительность: " + cleaning[2]);
+//        message.setReplyMarkup(othersInlineKeyboard());
+//        try {
+//            execute(message);
+//        } catch (TelegramApiException e) {
+//            System.out.println(e.getMessage());
+//        }
+//    }
 
     private InlineKeyboardMarkup othersInlineKeyboard() {
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
@@ -461,11 +401,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         return markupInline;
     }
 
-    private String[] serviceHaircut() {
+    private String[] serviceHaircutMen() {
         List<CustomerService> customerServices = customerServiceRepository.findAll();
         String[] haircut = new String[3];
         for (CustomerService customerService : customerServices) {
-            if (customerService.getName().equals("Haircut")) {
+            if (customerService.getName().equals("Стрижка мужская")) {
                 haircut[0] = customerService.getName();
                 haircut[1] = customerService.getPrice();
                 haircut[2] = customerService.getDuration();
@@ -487,30 +427,74 @@ public class TelegramBot extends TelegramLongPollingBot {
         return beard;
     }
 
-    private String[] serviceCleaningMask() {
-        List<CustomerService> services = customerServiceRepository.findAll();
-        String[] cleaningMask = new String[3];
-        for (CustomerService service : services) {
-            if (service.getName().equals("Cleaning Mask")) {
-                cleaningMask[0] = service.getName();
-                cleaningMask[1] = service.getPrice();
-                cleaningMask[2] = service.getDuration();
-            }
-        }
-        return cleaningMask;
-    }
-
-    private String[] serviceHaircutAndMask() {
+    private String[] serviceComplex() {
         List<CustomerService> services = customerServiceRepository.findAll();
         String[] haircutAndMask = new String[3];
         for (CustomerService service : services) {
-            if (service.getName().contains("Haircut+Cleaning Mask")) {
+            if (service.getName().contains("Стрижка+Борода")) {
                 haircutAndMask[0] = service.getName();
                 haircutAndMask[1] = service.getPrice();
                 haircutAndMask[2] = service.getDuration();
             }
         }
         return haircutAndMask;
+    }
+
+    private void serviceHaircutMan(long chatId, long messageId) {
+        String text = "Вы выбрали Стрижка Мужская. \n" +
+                "Ниже представлена информация про услугу:\n";
+        EditMessageText message = new EditMessageText();
+        message.setChatId(String.valueOf(chatId));
+        message.setMessageId((int) messageId);
+        String[] service = serviceHaircutMen();
+        message.setText(text + "\n" + "Услуга: " + service[0] + "\n" +
+                "Цена: " + service[1] + "\n" +
+                "Длительность: " + service[2] + "\n" +
+                "Вы хотите заказать эту услугу?");
+        message.setReplyMarkup(yesNoCommandKeyboard());
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private InlineKeyboardMarkup yesNoCommandKeyboard() {
+        InlineKeyboardMarkup markupIn = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+
+        List<InlineKeyboardButton> answerList = new ArrayList<>();
+        InlineKeyboardButton yesBtn = new InlineKeyboardButton();
+        yesBtn.setText("Да");
+        yesBtn.setCallbackData(String.valueOf(YesNoCommands.YES));
+
+        InlineKeyboardButton noBtn = new InlineKeyboardButton();
+        noBtn.setText("Нет");
+        noBtn.setCallbackData(String.valueOf(YesNoCommands.NO));
+        answerList.add(yesBtn);
+        answerList.add(noBtn);
+
+        rowsInline.add(answerList);
+        markupIn.setKeyboard(rowsInline);
+        return markupIn;
+    }
+
+    private void serviceHaircutting(long chatId, long messageId) {
+        String text = "Вы выбрали Стрижка+Борода. \nНиже представлена информация про услугу:\n";
+        EditMessageText message = new EditMessageText();
+        message.setChatId(String.valueOf(chatId));
+        message.setMessageId((int) messageId);
+        String[] service = serviceComplex();
+        message.setText(text + "\n" + "Услуга: " + service[0] + "\n" +
+                "Цена: " + service[1] + "\n" +
+                "Длительность: " + service[2] + "\n" +
+                "Вы хотите заказать эту услугу?");
+        message.setReplyMarkup(yesNoCommandKeyboard());
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 
