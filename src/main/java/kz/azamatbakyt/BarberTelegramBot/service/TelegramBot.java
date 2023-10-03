@@ -418,7 +418,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<CustomerService> customerServices = customerServiceRepository.findAll();
         String[] beard = new String[3];
         for (CustomerService customerService : customerServices) {
-            if (customerService.getName().equals("Beard")) {
+            if (customerService.getName().equals("Борода")) {
                 beard[0] = customerService.getName();
                 beard[1] = customerService.getPrice();
                 beard[2] = customerService.getDuration();
