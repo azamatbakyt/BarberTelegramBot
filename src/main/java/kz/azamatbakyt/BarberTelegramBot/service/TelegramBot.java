@@ -82,7 +82,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     sendServices(chatId);
                     break;
                 default:
-                    sendMessage(chatId, "Sorry command wasn't recognized");
+                    sendMessage(chatId, "Sorry command  wasn't recognized");
 
             }
         } else if (update.hasCallbackQuery()) {
