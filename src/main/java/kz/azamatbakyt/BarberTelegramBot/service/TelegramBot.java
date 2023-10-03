@@ -53,22 +53,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.config = config;
     }
 
-//    @PostConstruct
-//    private void init() {
-//        List<BotCommand> listOfCommands = new ArrayList();
-//        listOfCommands.add(new BotCommand("/start", "get a welcome message"));
-//        listOfCommands.add(new BotCommand("/services", "Services"));
-//        listOfCommands.add(new BotCommand("/mydata", "get your data stored"));
-//        listOfCommands.add(new BotCommand("/help", "info how to use this bot"));
-//        try {
-//            this.execute(new SetMyCommands(listOfCommands,
-//                    new BotCommandScopeDefault(),
-//                    null));
-//        } catch (TelegramApiException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
 
     @Override
     public String getBotUsername() {
@@ -95,7 +79,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     sendHelp(chatId, HELP_TEXT);
                     break;
                 case "Services":
-                    sendServices(chatId, ALL_SERVICES);
+                    sendServices(chatId);
                     break;
                 default:
                     sendMessage(chatId, "Sorry command wasn't recognized");
@@ -207,10 +191,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
-    private void sendServices(long chatId, String textToSend) {
+    private void sendServices(long chatId) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(String.valueOf(chatId));
-        sendMessage.setText(textToSend);
+        sendMessage.setText(ALL_SERVICES);
         sendMessage.setReplyMarkup(services());
         try {
             execute(sendMessage);
