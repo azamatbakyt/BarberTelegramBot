@@ -14,14 +14,19 @@ public class CustomerService{
     private String price;
     private String duration;
 
+    @ManyToOne
+    @JoinColumn(name = "customer_service_group_id", referencedColumnName = "id")
+    private CustomerServiceGroup group;
+
     public CustomerService() {
     }
 
-    public CustomerService(Long id, String name, String price, String duration) {
+    public CustomerService(Long id, String name, String price, String duration, CustomerServiceGroup group) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.duration = duration;
+        this.group = group;
     }
 
     public Long getId() {
@@ -54,6 +59,14 @@ public class CustomerService{
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    public CustomerServiceGroup getGroup() {
+        return group;
+    }
+
+    public void setGroup(CustomerServiceGroup group) {
+        this.group = group;
     }
 
     @Override
