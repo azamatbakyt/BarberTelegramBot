@@ -143,7 +143,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private InlineKeyboardMarkup haircutInlineKeyboard(CustomerServiceGroup group) {
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<CustomerService> services = customerServiceRepository.findAll()
+        List<CustomerService> services = customerServiceRepository.findAllByOrderByIdAsc()
                 .stream()
                 .filter(s -> s.getGroup().getId().equals(group.getId()))
                 .collect(Collectors.toList());

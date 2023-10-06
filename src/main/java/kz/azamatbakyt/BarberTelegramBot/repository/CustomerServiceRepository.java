@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CustomerServiceRepository extends JpaRepository<CustomerService, Long> {
     CustomerService findByName(String name);
+    List<CustomerService> findAllByOrderByIdAsc();
 }

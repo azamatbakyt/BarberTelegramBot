@@ -5,6 +5,11 @@
     <title>Title</title>
 </head>
 <body>
+<a th:href="${'/groups'}">Groups</a>
+
+<br/>
+<hr/>
+
 <table>
     <thead>
     <tr>
@@ -21,6 +26,7 @@
         <td th:text="${service.getName()}"></td>
         <td th:text="${service.getPrice()}"></td>
         <td th:text="${service.getDuration()}"></td>
+
         <td>
             <a th:href="${'/services/' + service.id }">Service</a>
             <a th:href="${'/services/' + service.id + '/delete'}">Delete</a>
