@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Service group</title>
+</head>
+<body>
+<a th:href="${'/services'}">Services</a>
+
+<br/>
+<hr/>
+<table>
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="serviceGroup : ${serviceGroupList}">
+        <td th:text="${serviceGroup.getId()}"></td>
+        <td th:text="${serviceGroup.getName()}"></td>
+        <td>
+            <a th:href="${'/groups/' + serviceGroup.id }">Service</a>
+            <a th:href="${'/groups/' + serviceGroup.id + '/delete'}">Delete</a>
+            <a th:href="${'/groups/' + serviceGroup.id + '/edit'}">Edit</a>
+        </td>
+
+    </tr>
+    </tbody>
+</table>
+<br/>
+<hr/>
+
+<a th:href="${'/groups/new'}">Create a service group</a>
+</body>
+</html>

@@ -1,6 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "customer_service_group")
@@ -10,6 +11,7 @@ public class CustomerServiceGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "Укажите правильное название")
     private String name;
 
     public CustomerServiceGroup() {}
@@ -33,6 +35,14 @@ public class CustomerServiceGroup {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "CustomerServiceGroup{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
 
