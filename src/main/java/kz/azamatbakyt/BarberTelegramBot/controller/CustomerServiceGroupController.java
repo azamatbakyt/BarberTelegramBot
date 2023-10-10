@@ -1,6 +1,5 @@
 package kz.azamatbakyt.BarberTelegramBot.controller;
 
-import kz.azamatbakyt.BarberTelegramBot.entity.CustomerService;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceRepository;

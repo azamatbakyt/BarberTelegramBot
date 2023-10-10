@@ -6,11 +6,9 @@ import kz.azamatbakyt.BarberTelegramBot.customerServices.*;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceRepository;
-import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
-import kz.azamatbakyt.BarberTelegramBot.customerServices.ComplexServices;
+import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerService;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -108,6 +106,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
     }
+
     private void choiceService(long chatId, long messageId, CustomerService customerService) {
         String text = "Вы выбрали " + customerService.getName() + ". \n" +
                 "Ниже представлена информация про услугу:\n";
@@ -147,19 +146,29 @@ public class TelegramBot extends TelegramLongPollingBot {
                 .stream()
                 .filter(s -> s.getGroup().getId().equals(group.getId()))
                 .collect(Collectors.toList());
-        List<InlineKeyboardButton> haircutServices = new ArrayList<>();
+
+        List<InlineKeyboardButton> currentRow = new ArrayList<>();
         for (CustomerService service : services) {
             InlineKeyboardButton haircutMen = new InlineKeyboardButton();
             haircutMen.setText(service.getName());
             haircutMen.setCallbackData(CallbackType.SERVICE + "%" + service.getName());
-            haircutServices.add(haircutMen);
+
+            currentRow.add(haircutMen);
+
+            if (currentRow.size() == 2) {
+                rowsInline.add(currentRow);
+                currentRow = new ArrayList<>();
+            }
         }
-        rowsInline.add(haircutServices);
+
+        if (!currentRow.isEmpty()) {
+            rowsInline.add(currentRow);
+        }
+
         markupInline.setKeyboard(rowsInline);
-
-
         return markupInline;
     }
+
 
     private void sendHelp(long chatId, String helpText) {
         SendMessage sendMessage = new SendMessage();
@@ -209,12 +218,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<KeyboardRow> rows = new ArrayList<>();
         KeyboardRow row = new KeyboardRow();
 
-        row.add("Services");
-        row.add("My works");
+        row.add("Услуги");
+        row.add("Мои работы");
         rows.add(row);
 
         row = new KeyboardRow();
-        row.add("My history");
+        row.add("Гайды");
         rows.add(row);
 
         keyboard.setKeyboard(rows);
@@ -226,21 +235,28 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<CustomerServiceGroup> serviceGroups = customerServiceGroupRepository.findAll();
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> rowHaircutAndBeard = new ArrayList<>();
+        List<InlineKeyboardButton> currentRow = new ArrayList<>();
         for (CustomerServiceGroup serviceGroup : serviceGroups) {
 
             InlineKeyboardButton buttonHaircutService = new InlineKeyboardButton();
             buttonHaircutService.setText(serviceGroup.getName());
             buttonHaircutService.setCallbackData(CallbackType.SERVICE_GROUP + "%" + serviceGroup.getName());
-            rowHaircutAndBeard.add(buttonHaircutService);
+            currentRow.add(buttonHaircutService);
+
+            if (currentRow.size() == 2){
+                rowsInline.add(currentRow);
+                currentRow = new ArrayList<>();
+            }
         }
-        rowsInline.add(rowHaircutAndBeard);
+
+        if (!currentRow.isEmpty()){
+            rowsInline.add(currentRow);
+        }
+
+
         markupInline.setKeyboard(rowsInline);
-
-
         return markupInline;
     }
-
 
 
     private InlineKeyboardMarkup yesNoCommandKeyboard() {
@@ -262,7 +278,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         markupIn.setKeyboard(rowsInline);
         return markupIn;
     }
-
 
 
 }

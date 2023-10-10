@@ -1,6 +1,12 @@
 package kz.azamatbakyt.BarberTelegramBot.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+
+import java.util.Optional;
+
 
 @Entity
 @Table(name = "customer_service")
@@ -10,10 +16,16 @@ public class CustomerService{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "Укажите правильно услугу")
     private String name;
+
+    @Min(value=0, message = "Укажите стоимость правильно")
     private String price;
+
+    @NotEmpty(message="Укажите длительность правильно")
     private String duration;
 
+    @NotEmpty(message = "Вы забыли выбрать группу")
     @ManyToOne
     @JoinColumn(name = "customer_service_group_id", referencedColumnName = "id")
     private CustomerServiceGroup group;
@@ -40,6 +52,8 @@ public class CustomerService{
     public String getName() {
         return name;
     }
+
+
 
     public void setName(String name) {
         this.name = name;

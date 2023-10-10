@@ -1,15 +1,17 @@
 package kz.azamatbakyt.BarberTelegramBot.controller;
 
+import jakarta.validation.Valid;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerService;
-import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Controller
@@ -48,7 +50,12 @@ public class CustomerServiceController {
     }
 
     @PostMapping("/save")
-    public String saveService(@ModelAttribute CustomerService service) {
+    public String saveService(@ModelAttribute @Valid CustomerService service,
+                              BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            return "customerService/form";
+        }
         customerServiceRepository.save(service);
         return "redirect:/services";
     }
@@ -61,14 +68,21 @@ public class CustomerServiceController {
 
     @GetMapping("/{id}/edit")
     public String editById(@PathVariable("id") Long id, Model model) {
-        CustomerService customerService = customerServiceRepository.findById(id).orElse(null);
+        CustomerService customerService = customerServiceRepository.findById(id)
+                .orElse(null);
         model.addAttribute("updatedService", customerService);
         return "customerService/edit";
     }
 
     @PostMapping("{id}")
-    public String update(@PathVariable("id") Long id, @ModelAttribute("updatedService") CustomerService service) {
+    public String update(@PathVariable("id") Long id,
+                         @ModelAttribute("updatedService") @Valid CustomerService service,
+                         BindingResult bindingResult) {
         CustomerService customerService = customerServiceRepository.findById(id).orElse(null);
+
+        if (bindingResult.hasErrors())
+            return "customerService/edit";
+
 
         if (customerService != null) {
             customerService.setName(service.getName());
@@ -80,8 +94,6 @@ public class CustomerServiceController {
 
         return "redirect:/services";
     }
-
-
 
 
 }
