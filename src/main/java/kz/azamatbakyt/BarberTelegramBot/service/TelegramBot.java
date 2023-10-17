@@ -76,7 +76,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "Help":
                     sendHelp(chatId, HELP_TEXT);
                     break;
-                case "Services":
+                case "Услуги":
                     sendServices(chatId);
                     break;
                 default:
