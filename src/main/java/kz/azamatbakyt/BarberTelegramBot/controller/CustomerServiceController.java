@@ -2,8 +2,8 @@ package kz.azamatbakyt.BarberTelegramBot.controller;
 
 import jakarta.validation.Valid;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerService;
-import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
-import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceRepository;
+import kz.azamatbakyt.BarberTelegramBot.service.CSGService;
+import kz.azamatbakyt.BarberTelegramBot.service.CSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,26 +18,25 @@ import java.util.Optional;
 @RequestMapping("/services")
 public class CustomerServiceController {
 
-    private final CustomerServiceRepository customerServiceRepository;
-    private final CustomerServiceGroupRepository customerServiceGroupRepository;
+    private final CSService csService;
+    private final CSGService csgService;
 
     @Autowired
-    public CustomerServiceController(CustomerServiceRepository customerServiceRepository,
-                                     CustomerServiceGroupRepository customerServiceGroupRepository) {
-        this.customerServiceRepository = customerServiceRepository;
-        this.customerServiceGroupRepository = customerServiceGroupRepository;
+    public CustomerServiceController(CSService csService, CSGService csgService) {
+        this.csService = csService;
+        this.csgService = csgService;
     }
 
     @GetMapping
     public String getAll(Model model) {
-        List<CustomerService> services = customerServiceRepository.findAllByOrderByIdAsc();
+        List<CustomerService> services = csService.getServices();
         model.addAttribute("services", services);
         return "customerService/list";
     }
 
     @GetMapping("/{id}")
     public String getById(@PathVariable("id") Long id, Model model) {
-        CustomerService service = customerServiceRepository.findById(id).orElse(null);
+        CustomerService service = csService.getServiceById(id);
         model.addAttribute("service", service);
         return "customerService/card";
     }
@@ -45,7 +44,7 @@ public class CustomerServiceController {
     @GetMapping("/new")
     public String getServiceForm(Model model) {
         model.addAttribute("service", new CustomerService());
-        model.addAttribute("serviceGroups", customerServiceGroupRepository.findAll());
+        model.addAttribute("serviceGroups", csgService.getServiceGroups());
         return "customerService/form";
     }
 
@@ -56,21 +55,21 @@ public class CustomerServiceController {
         if (bindingResult.hasErrors()) {
             return "customerService/form";
         }
-        customerServiceRepository.save(service);
+        csService.saveCustomerService(service);
         return "redirect:/services";
     }
 
     @GetMapping("/{id}/delete")
     public String deleteById(@PathVariable("id") Long id) {
-        customerServiceRepository.deleteById(id);
+        csService.deleteById(id);
         return "redirect:/services";
     }
 
     @GetMapping("/{id}/edit")
     public String editById(@PathVariable("id") Long id, Model model) {
-        CustomerService customerService = customerServiceRepository.findById(id)
-                .orElse(null);
+        CustomerService customerService = csService.getServiceById(id);
         model.addAttribute("updatedService", customerService);
+        model.addAttribute("serviceGroups", csgService.getServiceGroups());
         return "customerService/edit";
     }
 
@@ -78,7 +77,7 @@ public class CustomerServiceController {
     public String update(@PathVariable("id") Long id,
                          @ModelAttribute("updatedService") @Valid CustomerService service,
                          BindingResult bindingResult) {
-        CustomerService customerService = customerServiceRepository.findById(id).orElse(null);
+        CustomerService customerService = csService.getServiceById(id);
 
         if (bindingResult.hasErrors())
             return "customerService/edit";
@@ -89,7 +88,7 @@ public class CustomerServiceController {
             customerService.setPrice(service.getPrice());
             customerService.setDuration(service.getDuration());
 
-            customerServiceRepository.save(customerService);
+            csService.saveCustomerService(customerService);
         }
 
         return "redirect:/services";

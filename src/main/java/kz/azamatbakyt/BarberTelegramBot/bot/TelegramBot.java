@@ -1,4 +1,4 @@
-package kz.azamatbakyt.BarberTelegramBot.service;
+package kz.azamatbakyt.BarberTelegramBot.bot;
 
 
 import com.vdurmont.emoji.EmojiParser;
