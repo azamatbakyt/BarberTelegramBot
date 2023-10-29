@@ -29,7 +29,7 @@ public class CustomerServiceGroupController {
 
     @GetMapping("{id}")
     public String getServiceGroup(@PathVariable("id") Long id, Model model) {
-        CustomerServiceGroup serviceGroup = csgService.getService(id);
+        CustomerServiceGroup serviceGroup = csgService.getServiceGroup(id);
         model.addAttribute("serviceGroup", serviceGroup);
         return "customerService/serviceGroupCard";
     }
@@ -56,7 +56,7 @@ public class CustomerServiceGroupController {
 
     @GetMapping("/{id}/edit")
     public String updateServiceGroup(@PathVariable("id") Long id, Model model) {
-        CustomerServiceGroup customerServiceGroup = csgService.getService(id);
+        CustomerServiceGroup customerServiceGroup = csgService.getServiceGroup(id);
         model.addAttribute("updatedServiceGroup", customerServiceGroup);
         return "customerService/serviceGroupEdit";
     }
@@ -64,7 +64,7 @@ public class CustomerServiceGroupController {
     @PostMapping("/{id}")
     public String update(@PathVariable("id") Long id,
                          @ModelAttribute("updatedServiceGroup") CustomerServiceGroup serviceGroup) {
-        CustomerServiceGroup customerServiceGroup = csgService.getService(id);
+        CustomerServiceGroup customerServiceGroup = csgService.getServiceGroup(id);
         if (customerServiceGroup != null) {
             customerServiceGroup.setId(serviceGroup.getId());
             customerServiceGroup.setName(serviceGroup.getName());

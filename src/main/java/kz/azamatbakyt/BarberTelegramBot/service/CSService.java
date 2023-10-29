@@ -30,6 +30,10 @@ public class CSService {
                 .orElseThrow(() -> new ServiceNotFoundException("Услуга не найдена"));
     }
 
+    public CustomerService getServiceByName(String name){
+        return customerServiceRepository.findByName(name);
+    }
+
     public void saveCustomerService(CustomerService service) {
         customerServiceRepository.save(service);
     }
