@@ -2,7 +2,7 @@ package kz.azamatbakyt.BarberTelegramBot.controller;
 
 import jakarta.validation.Valid;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerService;
-import kz.azamatbakyt.BarberTelegramBot.service.CSGService;
+import kz.azamatbakyt.BarberTelegramBot.service.CustomerServiceGroupService;
 import kz.azamatbakyt.BarberTelegramBot.service.CSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,12 +18,12 @@ import java.util.List;
 public class CustomerServiceController {
 
     private final CSService csService;
-    private final CSGService csgService;
+    private final CustomerServiceGroupService customerServiceGroupService;
 
     @Autowired
-    public CustomerServiceController(CSService csService, CSGService csgService) {
+    public CustomerServiceController(CSService csService, CustomerServiceGroupService customerServiceGroupService) {
         this.csService = csService;
-        this.csgService = csgService;
+        this.customerServiceGroupService = customerServiceGroupService;
     }
 
     @GetMapping
@@ -43,7 +43,7 @@ public class CustomerServiceController {
     @GetMapping("/new")
     public String getServiceForm(Model model) {
         model.addAttribute("service", new CustomerService());
-        model.addAttribute("serviceGroups", csgService.getServiceGroups());
+        model.addAttribute("serviceGroups", customerServiceGroupService.getServiceGroups());
         return "customerService/form";
     }
 
@@ -68,7 +68,7 @@ public class CustomerServiceController {
     public String editById(@PathVariable("id") Long id, Model model) {
         CustomerService customerService = csService.getServiceById(id);
         model.addAttribute("updatedService", customerService);
-        model.addAttribute("serviceGroups", csgService.getServiceGroups());
+        model.addAttribute("serviceGroups", customerServiceGroupService.getServiceGroups());
         return "customerService/edit";
     }
 

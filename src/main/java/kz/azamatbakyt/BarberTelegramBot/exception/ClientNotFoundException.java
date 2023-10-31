@@ -1,0 +1,11 @@
+package kz.azamatbakyt.BarberTelegramBot.exception;
+
+public class ClientNotFoundException extends RuntimeException{
+
+    public ClientNotFoundException() {
+    }
+
+    public ClientNotFoundException(String message) {
+        super(message);
+    }
+}

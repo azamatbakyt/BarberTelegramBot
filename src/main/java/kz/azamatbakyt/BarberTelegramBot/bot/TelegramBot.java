@@ -5,11 +5,12 @@ import com.vdurmont.emoji.EmojiParser;
 import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
 import kz.azamatbakyt.BarberTelegramBot.customerServices.CallbackType;
 import kz.azamatbakyt.BarberTelegramBot.customerServices.YesNoCommands;
+import kz.azamatbakyt.BarberTelegramBot.entity.Clients;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerService;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
-import kz.azamatbakyt.BarberTelegramBot.entity.User;
-import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
-import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceRepository;
+import kz.azamatbakyt.BarberTelegramBot.service.CustomerServiceGroupService;
+import kz.azamatbakyt.BarberTelegramBot.service.CSService;
+import kz.azamatbakyt.BarberTelegramBot.service.ClientsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,12 +26,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-;
 
 @Slf4j
 @Component
@@ -38,13 +36,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 
     @Autowired
-    private CustomerServiceRepository customerServiceRepository;
+    private CSService csService;
     @Autowired
-    private CustomerServiceGroupRepository customerServiceGroupRepository;
+    private CustomerServiceGroupService customerServiceGroupService;
+    @Autowired
+    private ClientsService clientsService;
 
     private final BotConfig config;
 
-    private Map<Long, UserRegistration> userDataMap = new HashMap<>();
     private final static String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
             "You can execute commands from the main menu on the left or by typing commands:\n\n" +
             "Type /start to see welcome message\n\n" +
@@ -52,7 +51,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             "Type /register to register yourself\n\n" +
             "Type /mydata to see data stored about yourself\n\n" +
             "Type /help to see this message again";
-    private User user;
+
 
     private final static String ALL_SERVICES = "What service would you want to choose?";
 
@@ -60,7 +59,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         this.config = config;
     }
 
+    private final static String HELLO_MESSAGE = "Здравствуй, дорогой пользователь!" +
+            " Я смотрю ты у нас новый посетитель. Давай пройдем мини регистрацию. \n\n Напиши свое имя:";
 
+    private final static String ASK_PHONE = "А теперь пожалуйста напишите ваш номер телефона: ";
+    private final static String REGISTRATION_SUCCESSFUL = "Спасибо! Регистрация прошла успешно.";
     @Override
     public String getBotUsername() {
         return config.getBotName();
@@ -77,36 +80,39 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String message = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
-            UserRegistration userRegistration = userDataMap.get(chatId);
-            boolean registered = userRegistration != null && userRegistration.completed;
+            Clients client = clientsService.getClientByChatId(String.valueOf(chatId));
 
-            if (userRegistration == null) {
-                sendMessage(chatId, "text your name", registered);
-                userDataMap.put(chatId, new UserRegistration(new UserData(), false));
-
-            } else {
-                UserData userData = userRegistration.userData;
-                if (userData.name == null) {
-                    userData.setName(message);
-                    userDataMap.put(chatId, new UserRegistration(userData, false));
-                    sendMessage(chatId, "text your phone number", registered);
-                } else if (userData.phone == null) {
-                    userData.setPhone(message);
-                    sendMessage(chatId, "Registration successful", true);
-                    userDataMap.put(chatId, new UserRegistration(userData, true));
-                    String answer = EmojiParser.parseToUnicode("Hi, " + update.getMessage().getChat().getFirstName() + ", nice to meet you!" + "\uD83D\uDE0A");
+            if (client == null) {
+                sendMessage(chatId, HELLO_MESSAGE, false);
+                client = new Clients();
+                client.setChatId(String.valueOf(chatId));
+                clientsService.save(client);
+            } else{
+                if (client.getName() == null) {
+                    client.setName(message);
+                    sendMessage(chatId, ASK_PHONE, client.isRegistrationCompleted());
+                    clientsService.save(client);
+                } else if (client.getPhone() == null) {
+                    client.setPhone(message);
+                    client.setRegistrationCompleted(true);
+                    sendMessage(chatId, REGISTRATION_SUCCESSFUL, true);
+                    clientsService.save(client);
+                    String answer = EmojiParser.parseToUnicode("Добро пожаловать, " + client.getName()
+                            + ", что я могу вам предложить!" + "\uD83D\uDE0A");
                     sendMessage(chatId, answer, true);
                 } else {
                     switch (message) {
+                        case "/start":
+                            String answer = EmojiParser.parseToUnicode("И снова здравствуйте, " + client.getName()
+                                    + ", что я могу вам предложить!" + "\uD83D\uDE0A");
+                            sendMessage(chatId, answer, true);
+                            break;
                         case "Help":
                             sendHelp(chatId, HELP_TEXT);
                             break;
                         case "Услуги":
                             sendServices(chatId);
                             break;
-                        default:
-                            sendMessage(chatId, "Sorry command  wasn't recognized", registered);
-
                     }
                 }
             }
@@ -121,11 +127,11 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             switch (callbackType) {
                 case SERVICE_GROUP:
-                    CustomerServiceGroup group = customerServiceGroupRepository.findByName(callbackName);
+                    CustomerServiceGroup group = customerServiceGroupService.getServiceGroupByName(callbackName);
                     choiceServiceGroup(chatId, messageId, group);
                     break;
                 case SERVICE:
-                    CustomerService service = customerServiceRepository.findByName(callbackName);
+                    CustomerService service = csService.getServiceByName(callbackName);
                     choiceService(chatId, messageId, service);
                     break;
 
@@ -203,7 +209,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private InlineKeyboardMarkup haircutInlineKeyboard(CustomerServiceGroup group) {
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<CustomerService> services = customerServiceRepository.findAllByOrderByIdAsc()
+        List<CustomerService> services = csService.getServices()
                 .stream()
                 .filter(s -> s.getGroup().getId().equals(group.getId()))
                 .collect(Collectors.toList());
@@ -324,7 +330,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private InlineKeyboardMarkup services() {
-        List<CustomerServiceGroup> serviceGroups = customerServiceGroupRepository.findAll();
+        List<CustomerServiceGroup> serviceGroups = customerServiceGroupService.getServiceGroups();
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> currentRow = new ArrayList<>();

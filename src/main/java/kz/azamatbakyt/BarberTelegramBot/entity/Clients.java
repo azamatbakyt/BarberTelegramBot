@@ -3,31 +3,36 @@ package kz.azamatbakyt.BarberTelegramBot.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "clients")
+public class Clients {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "chat_id", unique = true)
-    private Long chatId;
-
+    @Column(name = "chat_id")
+    private String chatId;
     @Column(name = "name")
-    private String name;
+    public String name;
+
 
     @Column(name = "phone")
-    private String phone;
+    public String phone;
 
-    public User() {
+    @Column(name = "registration_completed")
+    private boolean registrationCompleted;
+
+    public Clients() {
     }
 
-    public User(Long id, Long chatId, String name, String phone) {
+    public Clients(Long id, String chatId, String name, String phone, boolean registrationCompleted) {
         this.id = id;
         this.chatId = chatId;
         this.name = name;
         this.phone = phone;
+        this.registrationCompleted = registrationCompleted;
     }
+
 
     public Long getId() {
         return id;
@@ -37,11 +42,11 @@ public class User {
         this.id = id;
     }
 
-    public Long getchatId() {
+    public String getChatId() {
         return chatId;
     }
 
-    public void setChatId(Long chatId) {
+    public void setChatId(String chatId) {
         this.chatId = chatId;
     }
 
@@ -61,13 +66,23 @@ public class User {
         this.phone = phone;
     }
 
+    public boolean isRegistrationCompleted() {
+        return registrationCompleted;
+    }
+
+    public void setRegistrationCompleted(boolean registrationCompleted) {
+        this.registrationCompleted = registrationCompleted;
+    }
+
+
     @Override
     public String toString() {
-        return "User{" +
+        return "Clients{" +
                 "id=" + id +
-                ", chatId='" + chatId + '\'' +
+                ", chatId=" + chatId +
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
+                ", registrationCompleted=" + registrationCompleted +
                 '}';
     }
 }

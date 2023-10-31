@@ -1,24 +1,21 @@
 package kz.azamatbakyt.BarberTelegramBot.service;
 
+import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
 import kz.azamatbakyt.BarberTelegramBot.exception.ServiceGroupNotFoundException;
+import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import kz.azamatbakyt.BarberTelegramBot.entity.CustomerService;
-import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
-import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
-import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceRepository;
-
 
 @Service
-public class CSGService {
+public class CustomerServiceGroupService {
 
     private final CustomerServiceGroupRepository customerServiceGroupRepository;
 
     @Autowired
-    public CSGService(CustomerServiceGroupRepository customerServiceGroupRepository) {
+    public CustomerServiceGroupService(CustomerServiceGroupRepository customerServiceGroupRepository) {
         this.customerServiceGroupRepository = customerServiceGroupRepository;
     }
 
