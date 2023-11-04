@@ -36,3 +36,8 @@ create table if not exists clients
     registration_completed boolean not null
 );
 
+create table if not exists timeslots(
+    id  bigserial primary key,
+    start_time time,
+    end_time time
+);

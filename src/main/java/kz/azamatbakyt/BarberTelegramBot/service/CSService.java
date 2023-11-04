@@ -13,12 +13,10 @@ import java.util.List;
 public class CSService {
 
     private final CustomerServiceRepository customerServiceRepository;
-    private final CustomerServiceGroupRepository customerServiceGroupRepository;
 
     @Autowired
-    public CSService(CustomerServiceRepository customerServiceRepository, CustomerServiceGroupRepository customerServiceGroupRepository) {
+    public CSService(CustomerServiceRepository customerServiceRepository) {
         this.customerServiceRepository = customerServiceRepository;
-        this.customerServiceGroupRepository = customerServiceGroupRepository;
     }
 
     public List<CustomerService> getServices() {
