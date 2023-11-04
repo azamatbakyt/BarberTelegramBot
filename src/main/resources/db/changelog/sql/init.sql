@@ -41,3 +41,9 @@ create table if not exists timeslots(
     start_time time,
     end_time time
 );
+
+create table if not exists schedules(
+    id bigserial primary key,
+    day_of_week varchar(255) ,
+    timeslot_id bigint not null references timeslots(id) on delete cascade
+    );

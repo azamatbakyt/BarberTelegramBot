@@ -28,15 +28,13 @@ public class CustomerServiceController {
 
     @GetMapping
     public String getAll(Model model) {
-        List<CustomerService> services = csService.getServices();
-        model.addAttribute("services", services);
+        model.addAttribute("services", csService.getServices());
         return "customerService/list";
     }
 
     @GetMapping("/{id}")
     public String getById(@PathVariable("id") Long id, Model model) {
-        CustomerService service = csService.getServiceById(id);
-        model.addAttribute("service", service);
+        model.addAttribute("service", csService.getServiceById(id));
         return "customerService/card";
     }
 

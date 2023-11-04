@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/timeslots")
 public class TimeslotsController {
 
-    private TimeslotsService timeslotsService;
+    private final TimeslotsService timeslotsService;
 
     @Autowired
     public TimeslotsController(TimeslotsService timeslotsService) {
@@ -23,7 +23,7 @@ public class TimeslotsController {
     public String getTimeSlots(Model model) {
         model.addAttribute("timeslots", timeslotsService.getAll());
 
-        return "customerService/timeslots";
+        return "customerService/timeslotsList";
     }
 
     @GetMapping("/new")
@@ -40,7 +40,7 @@ public class TimeslotsController {
     }
 
     @GetMapping("/{id}/edit")
-    public String editTimeslot(@PathVariable("id") Long id, Model model){
+    public String editTimeslot(@PathVariable("id") Long id, Model model) {
         Timeslots timeslot = timeslotsService.getTimeslot(id);
         model.addAttribute("timeslotToUpdate", timeslot);
 
@@ -49,9 +49,9 @@ public class TimeslotsController {
 
     @PostMapping("/{id}")
     public String updateTimeslot(@PathVariable("id") Long id,
-                                 @ModelAttribute("timeslotToUpdate") Timeslots updatedTimeslot){
+                                 @ModelAttribute("timeslotToUpdate") Timeslots updatedTimeslot) {
         Timeslots timeslot = timeslotsService.getTimeslot(id);
-        if (timeslot != null){
+        if (timeslot != null) {
             timeslot.setStart_time(updatedTimeslot.getStart_time());
             timeslot.setEnd_time(updatedTimeslot.getEnd_time());
 
@@ -63,7 +63,7 @@ public class TimeslotsController {
     }
 
     @GetMapping("/{id}/delete")
-    public String deleteTimeslot(@PathVariable("id") Long id){
+    public String deleteTimeslot(@PathVariable("id") Long id) {
         timeslotsService.deleteTimeslot(id);
         return "redirect:/timeslots";
     }
