@@ -47,3 +47,11 @@ create table if not exists schedules(
     day_of_week varchar(255) ,
     timeslot_id bigint not null references timeslots(id) on delete cascade
     );
+
+
+create table if not exists custom_schedules
+(
+    id bigserial primary key,
+    custom_date DATE,
+    timeslot_id bigint not null references timeslots(id) on delete cascade
+    );

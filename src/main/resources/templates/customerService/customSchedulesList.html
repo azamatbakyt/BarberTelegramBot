@@ -27,7 +27,7 @@
             margin-bottom: 3px;
             margin-right: 1170px;
         }
-        .schedules-table{
+        .customSchedules-table{
             padding-left: 30px;
             padding-right: 30px;
         }
@@ -69,16 +69,16 @@
 
 <div class="create-btn">
     <button type="button" class="btn btn-primary">
-        <a style="color:white" class="nav-link" th:href="${'/schedules/new'}">Create a new schedule</a>
+        <a style="color:white" class="nav-link" th:href="${'/custom-schedules/new'}">Create a new schedule</a>
     </button>
 </div>
 
-<div class="schedules-table">
+<div class="customSchedules-table">
     <table class="table table-bordered">
         <thead class="table-dark">
         <tr>
             <th scope="col">Id</th>
-            <th scope="col">Day of week</th>
+            <th scope="col">Exact date</th>
             <th scope="col">Timeslot</th>
             <th scope="col">Actions</th>
 
@@ -86,20 +86,20 @@
         </tr>
         </thead>
         <tbody >
-        <tr th:each="schedule : ${schedules}">
+        <tr th:each="schedule : ${customSchedules}">
             <td th:text="${schedule.getId()}"></td>
-            <td th:text="${schedule.getDay_of_week()}"></td>
+            <td th:text="${schedule.getCustom_date()}"></td>
             <td th:text="${schedule.getTimeslot().getStart_time()} + ' - ' + ${schedule.getTimeslot().getEnd_time()}"></td>
 
 
 
             <td>
                 <button type="button" class="btn btn-primary"><a style="color:white"
-                                                                 th:href="${'/schedules/' + schedule.id + '/edit'}">Edit</a>
+                                                                 th:href="${'/custom-schedules/' + schedule.id + '/edit'}">Edit</a>
                 </button>
 
                 <button type="button" class="btn btn-danger"><a style="color:white"
-                                                                th:href="${'/schedules/' + schedule.id + '/delete'}">Delete</a>
+                                                                th:href="${'/custom-schedules/' + schedule.id + '/delete'}">Delete</a>
                 </button>
             </td>
 
