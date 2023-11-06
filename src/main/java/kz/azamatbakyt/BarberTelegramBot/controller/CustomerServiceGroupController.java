@@ -24,20 +24,14 @@ public class CustomerServiceGroupController {
     public String getAll(Model model) {
         List<CustomerServiceGroup> serviceGroupList = customerServiceGroupService.getServiceGroups();
         model.addAttribute("serviceGroupList", serviceGroupList);
-        return "customerService/serviceGroupList";
+        return "customerServiceGroup/list";
     }
 
-    @GetMapping("{id}")
-    public String getServiceGroup(@PathVariable("id") Long id, Model model) {
-        CustomerServiceGroup serviceGroup = customerServiceGroupService.getServiceGroup(id);
-        model.addAttribute("serviceGroup", serviceGroup);
-        return "customerService/serviceGroupCard";
-    }
 
     @GetMapping("/new")
     public String getCreateForm(Model model) {
         model.addAttribute("newServiceGroup", new CustomerServiceGroup());
-        return "customerService/serviceGroupForm";
+        return "customerServiceGroup/form";
     }
 
     @PostMapping("/save")
@@ -58,7 +52,7 @@ public class CustomerServiceGroupController {
     public String updateServiceGroup(@PathVariable("id") Long id, Model model) {
         CustomerServiceGroup customerServiceGroup = customerServiceGroupService.getServiceGroup(id);
         model.addAttribute("updatedServiceGroup", customerServiceGroup);
-        return "customerService/serviceGroupEdit";
+        return "customerServiceGroup/edit";
     }
 
     @PostMapping("/{id}")

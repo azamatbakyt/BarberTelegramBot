@@ -30,7 +30,7 @@ create table if not exists customer_service
 create table if not exists clients
 (
     id bigserial primary key,
-    chat_id varchar(255) unique,
+    chat_id bigserial unique,
     name varchar(255),
     phone varchar(255) unique,
     registration_completed boolean not null

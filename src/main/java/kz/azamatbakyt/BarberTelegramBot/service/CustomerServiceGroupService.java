@@ -1,7 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.service;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
-import kz.azamatbakyt.BarberTelegramBot.exception.ServiceGroupNotFoundException;
+import kz.azamatbakyt.BarberTelegramBot.exception.EntityNotFoundException;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class CustomerServiceGroupService {
 
     public CustomerServiceGroup getServiceGroup(Long id) {
         return customerServiceGroupRepository.findById(id)
-                .orElseThrow(() -> new ServiceGroupNotFoundException("Данная группа услуг не найдена"));
+                .orElseThrow(() -> new EntityNotFoundException("Данная группа услуг не найдена"));
     }
 
     public CustomerServiceGroup getServiceGroupByName(String name){

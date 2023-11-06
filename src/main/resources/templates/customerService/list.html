@@ -15,8 +15,7 @@
 
         .container {
             margin-top: 20px;
-            margin-left: 450px;
-            margin-right: 400px;
+
         }
 
         .create-btn {
@@ -25,7 +24,8 @@
             margin-bottom: 3px;
             margin-right: 1170px;
         }
-        .service-table{
+
+        .service-table {
             padding-left: 30px;
             padding-right: 30px;
         }
@@ -35,7 +35,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="#">Home</a>
+        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -49,14 +49,18 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="${'/groups'}">Service Groups</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link" href="/timeslots">Timeslots</a>
+                    <a class="nav-link" th:href="${'/timeslots'}">Timeslots</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/schedules">Schedules</a>
+                    <a class="nav-link" th:href="${'/schedules'}">Schedules</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/custom-schedules">Custom Schedules</a>
+                    <a class="nav-link" th:href="${'/custom-schedules'}">Custom Schedules</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/clients'}">Clients</a>
                 </li>
             </ul>
 
@@ -67,7 +71,7 @@
 
 <div class="create-btn">
     <button type="button" class="btn btn-primary">
-        <a style="color:white" class="nav-link" th:href="${'/services/new'}">Create a New Service</a>
+        <a style="color:white" class="nav-link" th:href="${'/services/new'}">Create a new service</a>
     </button>
 </div>
 
@@ -83,7 +87,7 @@
             <th scope="col">Actions</th>
         </tr>
         </thead>
-        <tbody >
+        <tbody>
         <tr th:each="service : ${services}">
             <td th:text="${service.getId()}"></td>
             <td th:text="${service.getName()}"></td>

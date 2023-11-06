@@ -14,10 +14,9 @@
 
         .container {
             margin-top: 20px;
-
         }
 
-        .service-editForm {
+        .appointment-form {
             padding-left: 300px;
             padding-right: 170px;
         }
@@ -31,16 +30,14 @@
             font-weight: bold;
         }
 
-        .error-message {
-            color: #ff0000;
-        }
+
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" th:href="${'/appointments'}">Appoinments</a>
+        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -72,35 +69,46 @@
         </div>
     </div>
 </nav>
-<div class="service-editForm">
-    <h1 class="mt-4">Editing the service</h1>
-    <form th:action="@{/services/{id}(id=${updatedService.getId()})}" th:object="${updatedService}" method="post">
+<div class="appointment-form">
+    <h1 class="mt-4">Create a new appointment</h1>
+    <form action="#" th:action="@{/appointments/save}" th:object="${newAppointment}" method="post">
+
+
         <div class="form-group">
-            <label for="name">Service Name</label>
-            <input type="text" class="form-control" id="name" th:field="*{name}">
-            <div class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-        </div>
-        <div class="form-group">
-            <label for="price">Price</label>
-            <input type="text" class="form-control" id="price" th:field="*{price}">
-            <div class="error-message" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
-        </div>
-        <div class="form-group">
-            <label for="duration">Duration (in minutes)</label>
-            <input type="text" class="form-control" id="duration" th:field="*{duration}">
-            <div class="error-message" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
-        </div>
-        <div class="form-group">
-            <label for="group">Service Group</label>
-            <select class="form-control" id="group" th:field="*{group}">
-                <option th:each="serviceGroup : ${serviceGroups}" th:value="${serviceGroup.id}"
-                        th:text="${serviceGroup.name}"></option>
+            <label for="client">Choose a client</label>
+            <select class="form-control" id="client" th:field="*{client}">
+                <option th:each="client : ${clients}" th:value="${client.id}"
+                        th:text="${client.getName()}"></option>
             </select>
-            <div class="error-message" th:if="${#fields.hasErrors('group')}" th:errors="*{group}"></div>
         </div>
+
+        <div class="form-group">
+            <label for="service">Choose a service</label>
+            <select class="form-control" id="service" th:field="*{service}">
+                <option th:each="service : ${services}" th:value="${service.id}"
+                        th:text="${service.getName()}"></option>
+            </select>
+        </div>
+
+
+        <div class="form-group">
+            <label for="time">Choose a time</label>
+            <select class="form-control" id="time" th:field="*{timeslot}">
+                <option th:each="timeslot : ${timeslotsForAppointment}" th:value="${timeslot.id}"
+                        th:text="${timeslot.getStartTime()} + ' - ' + ${timeslot.getEndTime()}"></option>
+            </select>
+        </div>
+
+
+        <div class="form-group">
+            <label for="date">Enter the date</label>
+            <input type="date" class="form-control" id="date" th:field="*{dateOfBooking}">
+        </div>
+
 
         <button type="submit" class="btn btn-primary">Submit</button>
         <button type="reset" class="btn btn-secondary">Reset</button>
+
     </form>
 </div>
 
@@ -112,6 +120,3 @@
         crossorigin="anonymous"></script>
 </body>
 </html>
-
-
-

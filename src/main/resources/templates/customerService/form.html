@@ -14,14 +14,14 @@
 
         .container {
             margin-top: 20px;
-            margin-left: 450px;
-            margin-right: 400px;
+
         }
 
-        .service-form{
+        .service-form {
             padding-left: 300px;
             padding-right: 170px;
         }
+
         .form-group {
             margin-bottom: 20px;
             padding-right: 100px;
@@ -40,7 +40,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="#">Home</a>
+        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -54,14 +54,18 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="${'/groups'}">Service Groups</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link" href="/timeslots">Timeslots</a>
+                    <a class="nav-link" th:href="${'/timeslots'}">Timeslots</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/schedules">Schedules</a>
+                    <a class="nav-link" th:href="${'/schedules'}">Schedules</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/custom-schedules">Custom Schedules</a>
+                    <a class="nav-link" th:href="${'/custom-schedules'}">Custom Schedules</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/clients'}">Clients</a>
                 </li>
             </ul>
 
@@ -69,7 +73,7 @@
     </div>
 </nav>
 <div class="service-form">
-    <h1 class="mt-4">Create a New Service</h1>
+    <h1 class="mt-4">Create a new service</h1>
     <form action="#" th:action="@{/services/save}" th:object="${service}" method="post">
         <div class="form-group">
             <label for="name">Service Name</label>

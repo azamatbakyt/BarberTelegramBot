@@ -14,15 +14,14 @@
 
         .container {
             margin-top: 20px;
-            margin-left: 450px;
-            margin-right: 400px;
+
         }
 
         label {
             font-weight: bold;
         }
 
-        .service-card{
+        .service-card {
             margin-left: 525px;
             margin-right: 400px;
             width: 400px;
@@ -35,7 +34,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="#">Home</a>
+        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -48,14 +47,18 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="${'/groups'}">Service Groups</a>
                 </li>
+
                 <li class="nav-item">
-                    <a class="nav-link" href="/timeslots">Timeslots</a>
+                    <a class="nav-link" th:href="${'/timeslots'}">Timeslots</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/schedules">Schedules</a>
+                    <a class="nav-link" th:href="${'/schedules'}">Schedules</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/custom-schedules">Custom Schedules</a>
+                    <a class="nav-link" th:href="${'/custom-schedules'}">Custom Schedules</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/clients'}">Clients</a>
                 </li>
             </ul>
 
@@ -65,8 +68,9 @@
 
 <div class="service-card">
     <h1>Service Card</h1>
-    <div class="card" >
-        <img src="https://creativevip.net/resource-images/30-hair-dresser-barber-icons-3.png" class="card-img-top" alt="...">
+    <div class="card">
+        <img src="https://creativevip.net/resource-images/30-hair-dresser-barber-icons-3.png" class="card-img-top"
+             alt="...">
         <div class="card-body">
             <h5 class="card-title" th:text="${service.name}"></h5>
         </div>
