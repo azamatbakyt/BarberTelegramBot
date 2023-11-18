@@ -51,6 +51,8 @@ public class Timeslot {
         this.endTime = endTime;
     }
 
+
+
     @Override
     public String toString() {
         return "Timeslots{" +

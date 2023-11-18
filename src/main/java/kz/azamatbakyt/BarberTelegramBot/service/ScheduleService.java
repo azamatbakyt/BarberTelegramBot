@@ -3,6 +3,7 @@ package kz.azamatbakyt.BarberTelegramBot.service;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Schedule;
 import kz.azamatbakyt.BarberTelegramBot.exception.EntityNotFoundException;
+import kz.azamatbakyt.BarberTelegramBot.helpers.DayOfWeek;
 import kz.azamatbakyt.BarberTelegramBot.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,5 +35,9 @@ public class ScheduleService {
 
     public void deleteSchedule(Long id){
         scheduleRepository.deleteById(id);
+    }
+
+    public Schedule getScheduleByDayOfWeek(DayOfWeek dayOfWeek){
+        return scheduleRepository.findScheduleByDayOfWeek(dayOfWeek);
     }
 }
