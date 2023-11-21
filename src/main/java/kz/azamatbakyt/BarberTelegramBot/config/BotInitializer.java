@@ -1,7 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.config;
 
 
-import kz.azamatbakyt.BarberTelegramBot.service.TelegramBot;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramBot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

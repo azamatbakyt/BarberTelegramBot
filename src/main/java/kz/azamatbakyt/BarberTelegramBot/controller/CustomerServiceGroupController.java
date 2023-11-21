@@ -1,8 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.controller;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
-import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceGroupRepository;
-import kz.azamatbakyt.BarberTelegramBot.repository.CustomerServiceRepository;
+import kz.azamatbakyt.BarberTelegramBot.service.CustomerServiceGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,74 +13,61 @@ import java.util.List;
 @RequestMapping("/groups")
 public class CustomerServiceGroupController {
 
-    private final CustomerServiceRepository customerServiceRepository;
-    private final CustomerServiceGroupRepository customerServiceGroupRepository;
+    private final CustomerServiceGroupService customerServiceGroupService;
 
     @Autowired
-    public CustomerServiceGroupController(CustomerServiceGroupRepository customerServiceGroupRepository,
-                                          CustomerServiceRepository customerServiceRepository) {
-        this.customerServiceGroupRepository = customerServiceGroupRepository;
-        this.customerServiceRepository = customerServiceRepository;
+    public CustomerServiceGroupController(CustomerServiceGroupService customerServiceGroupService) {
+        this.customerServiceGroupService = customerServiceGroupService;
     }
 
     @GetMapping
     public String getAll(Model model) {
-        List<CustomerServiceGroup> serviceGroupList = customerServiceGroupRepository.findAll();
+        List<CustomerServiceGroup> serviceGroupList = customerServiceGroupService.getServiceGroups();
         model.addAttribute("serviceGroupList", serviceGroupList);
-        return "customerService/serviceGroupList";
+        return "customerServiceGroup/list";
     }
 
-    @GetMapping("{id}")
-    public String getServiceGroup(@PathVariable("id") Long id, Model model) {
-        CustomerServiceGroup serviceGroup = customerServiceGroupRepository.findById(id).orElse(null);
-        model.addAttribute("serviceGroup", serviceGroup);
-        return "customerService/serviceGroupCard";
-    }
 
     @GetMapping("/new")
     public String getCreateForm(Model model) {
         model.addAttribute("newServiceGroup", new CustomerServiceGroup());
-        return "customerService/serviceGroupForm";
+        return "customerServiceGroup/form";
     }
 
     @PostMapping("/save")
     public String createServiceGroup(@ModelAttribute CustomerServiceGroup customerServiceGroup) {
 
-        customerServiceGroupRepository.save(customerServiceGroup);
-
+        customerServiceGroupService.saveServiceGroup(customerServiceGroup);
         return "redirect:/groups";
     }
 
     @GetMapping("/{id}/delete")
     public String deleteServiceGroup(@PathVariable("id") Long id) {
-        customerServiceGroupRepository.deleteById(id);
+        customerServiceGroupService.deleteGroupById(id);
 
         return "redirect:/groups";
     }
 
     @GetMapping("/{id}/edit")
     public String updateServiceGroup(@PathVariable("id") Long id, Model model) {
-        CustomerServiceGroup customerServiceGroup = customerServiceGroupRepository.findById(id)
-                .orElse(null);
+        CustomerServiceGroup customerServiceGroup = customerServiceGroupService.getServiceGroup(id);
         model.addAttribute("updatedServiceGroup", customerServiceGroup);
-        return "customerService/serviceGroupEdit";
+        return "customerServiceGroup/edit";
     }
 
     @PostMapping("/{id}")
     public String update(@PathVariable("id") Long id,
-                         @ModelAttribute("updatedServiceGroup") CustomerServiceGroup serviceGroup){
-        CustomerServiceGroup customerServiceGroup = customerServiceGroupRepository.findById(id).orElse(null);
-        if (customerServiceGroup != null){
+                         @ModelAttribute("updatedServiceGroup") CustomerServiceGroup serviceGroup) {
+        CustomerServiceGroup customerServiceGroup = customerServiceGroupService.getServiceGroup(id);
+        if (customerServiceGroup != null) {
             customerServiceGroup.setId(serviceGroup.getId());
             customerServiceGroup.setName(serviceGroup.getName());
 
-            customerServiceGroupRepository.save(customerServiceGroup);
+            customerServiceGroupService.saveServiceGroup(customerServiceGroup);
         }
 
         return "redirect:/groups";
     }
-
-
 
 
 }
