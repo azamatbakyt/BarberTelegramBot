@@ -2,11 +2,11 @@ package kz.azamatbakyt.BarberTelegramBot.entity;
 
 
 import jakarta.persistence.*;
-import kz.azamatbakyt.BarberTelegramBot.helpers.DayOfWeek;
+import java.time.DayOfWeek;
 
 
 @Entity
-@Table(name = "schedules")
+@Table(name = "schedule")
 public class Schedule {
 
     @Id

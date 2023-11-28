@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 
 @Entity
-@Table(name = "custom_schedules")
+@Table(name = "custom_schedule")
 public class CustomSchedule {
 
     @Id
