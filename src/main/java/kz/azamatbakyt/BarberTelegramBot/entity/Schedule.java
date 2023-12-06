@@ -13,6 +13,7 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "day_of_week")
     private DayOfWeek dayOfWeek;
 
     @ManyToOne
@@ -44,6 +45,8 @@ public class Schedule {
     public void setDayOfWeek(DayOfWeek day_of_week) {
         this.dayOfWeek = day_of_week;
     }
+
+
 
     public Timeslot getTimeslot() {
         return timeslot;

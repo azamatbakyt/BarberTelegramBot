@@ -21,9 +21,6 @@ public class Appointment {
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     private CustomerService service;
 
-    @ManyToOne
-    @JoinColumn(name = "timeslot_id", referencedColumnName = "id")
-    private Timeslot timeslot;
 
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
@@ -31,11 +28,16 @@ public class Appointment {
 
     public Appointment() {}
 
-    public Appointment(Long id, Client client, CustomerService service, Timeslot timeslot, LocalDate dateOfBooking) {
+    public Appointment(Long id, Client client, CustomerService service, LocalDate dateOfBooking) {
         this.id = id;
         this.client = client;
         this.service = service;
-        this.timeslot = timeslot;
+        this.dateOfBooking = dateOfBooking;
+    }
+
+    public Appointment(Client client, CustomerService service, LocalDate dateOfBooking) {
+        this.client = client;
+        this.service = service;
         this.dateOfBooking = dateOfBooking;
     }
 
@@ -65,13 +67,7 @@ public class Appointment {
         this.service = service;
     }
 
-    public Timeslot getTimeslot() {
-        return timeslot;
-    }
 
-    public void setTimeslot(Timeslot timeslot) {
-        this.timeslot = timeslot;
-    }
 
     public LocalDate getDateOfBooking() {
         return dateOfBooking;
@@ -87,7 +83,6 @@ public class Appointment {
                 "id=" + id +
                 ", client=" + client +
                 ", service=" + service +
-                ", timeslot=" + timeslot +
                 ", date_of_booking=" + dateOfBooking +
                 '}';
     }

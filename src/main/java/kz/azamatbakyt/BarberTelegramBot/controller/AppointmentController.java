@@ -71,7 +71,6 @@ public class AppointmentController {
         if (appointmentToUpdate != null) {
             appointmentToUpdate.setClient(appointment.getClient());
             appointmentToUpdate.setService(appointment.getService());
-            appointmentToUpdate.setTimeslot(appointment.getTimeslot());
             appointmentToUpdate.setDateOfBooking(appointment.getDateOfBooking());
 
             appointmentService.save(appointmentToUpdate);

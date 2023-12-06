@@ -18,12 +18,13 @@ public class CustomerService{
     private String name;
 
     @Min(value=0, message = "Укажите стоимость правильно")
-    private String price;
+    private int price;
+
 
     @NotEmpty(message="Укажите длительность правильно")
-    private String duration;
+    private int duration;
 
-    @NotEmpty(message = "Вы забыли выбрать группу")
+
     @ManyToOne
     @JoinColumn(name = "customer_service_group_id", referencedColumnName = "id")
     private CustomerServiceGroup group;
@@ -31,7 +32,7 @@ public class CustomerService{
     public CustomerService() {
     }
 
-    public CustomerService(Long id, String name, String price, String duration, CustomerServiceGroup group) {
+    public CustomerService(Long id, String name, int price, int duration, CustomerServiceGroup group) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -57,19 +58,19 @@ public class CustomerService{
         this.name = name;
     }
 
-    public String getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
-    public String getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 

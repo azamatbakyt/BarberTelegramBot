@@ -29,6 +29,11 @@ public class AppointmentTimeslot {
         this.timeslot = timeslot;
     }
 
+    public AppointmentTimeslot(Appointment appointment, Timeslot timeslot) {
+        this.appointment = appointment;
+        this.timeslot = timeslot;
+    }
+
     public Long getId() {
         return id;
     }

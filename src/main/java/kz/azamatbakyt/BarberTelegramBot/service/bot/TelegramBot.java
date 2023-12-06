@@ -5,6 +5,7 @@ import com.vdurmont.emoji.EmojiParser;
 import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
 import kz.azamatbakyt.BarberTelegramBot.entity.*;
 import kz.azamatbakyt.BarberTelegramBot.helpers.CallbackType;
+import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,13 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -41,6 +46,10 @@ public class TelegramBot extends TelegramLongPollingBot {
     private ScheduleService scheduleService;
     @Autowired
     private TimeslotService timeslotService;
+    @Autowired
+    private AppointmentService appointmentService;
+    @Autowired
+    private AppointmentTimeslotRepository appointmentTimeslotRepository;
     private final BotConfig config;
 
     private final static String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
@@ -74,6 +83,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         return config.getToken();
     }
 
+    private String callbackService = null;
+    private final Appointment appointment = new Appointment();
+    private final AppointmentTimeslot appointmentTimeslot = new AppointmentTimeslot();
     @Override
     public void onUpdateReceived(Update update) {
 
@@ -100,11 +112,13 @@ public class TelegramBot extends TelegramLongPollingBot {
                     String answer = EmojiParser.parseToUnicode("Добро пожаловать, " + client.getName()
                             + ", что я могу вам предложить!" + "\uD83D\uDE0A");
                     sendMessage(chatId, answer, true);
+                    appointment.setClient(client);
                 } else {
                     switch (message) {
                         case "/start":
                             String answer = EmojiParser.parseToUnicode("И снова здравствуйте, " + client.getName()
                                     + ", что я могу вам предложить!" + "\uD83D\uDE0A");
+                            appointment.setClient(client);
                             sendMessage(chatId, answer, true);
                             break;
                         case "Help":
@@ -133,17 +147,33 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case SERVICE:
                     CustomerService service = csService.getServiceByName(callbackName);
                     choiceService(chatId, messageId, service);
+                    appointment.setService(service);
+
                     break;
                 case YES_FOR_CREATING_APPOINTMENT:
                     CustomerService serviceForBooking = csService.getServiceByName(callbackName);
+                    callbackService = serviceForBooking.getName();
                     choiceDayForBooking(chatId, messageId, serviceForBooking);
                     break;
                 case CHOOSE_TIMESLOT:
-                    choiceTimeslot(chatId, messageId);
+                    DayOfWeek dayForBooking = DayOfWeek.valueOf(callbackName);
+                    appointment.setDateOfBooking(LocalDate.now().with(TemporalAdjusters.nextOrSame(dayForBooking)));
+                    CustomerService serviceBeforeMakingAppointment = csService.getServiceByName(callbackService);
+                    choiceTimeslot(chatId, messageId, dayForBooking, serviceBeforeMakingAppointment);
+                    appointmentService.save(appointment);
+                    appointmentTimeslot.setAppointment(appointment);
                     break;
                 case MAKE_APPOINTMENT:
                     Timeslot timeslot = timeslotService.getTimeslotByStartTime(LocalTime.parse(callbackName));
                     confirmAppointment(chatId, messageId, timeslot);
+                    appointmentTimeslot.setTimeslot(timeslot);
+                    System.out.println(appointment.getClient().getName());
+                    System.out.println(appointment.getService().getName());
+                    System.out.println(appointment.getDateOfBooking().toString());
+                    appointmentTimeslotRepository.save(appointmentTimeslot);
+                    break;
+                case APPOINTMENT_CREATED:
+                    appointmentCreated(chatId, messageId, appointment, appointmentTimeslot);
                     break;
             }
 
@@ -215,14 +245,14 @@ public class TelegramBot extends TelegramLongPollingBot {
         return markupInline;
     }
 
-    private void choiceTimeslot(long chatId, long messageId) {
-        String text = "Отлично! Вы выбрали дату " +
+    private void choiceTimeslot(long chatId, long messageId, DayOfWeek date, CustomerService customerService) {
+        String text = "Отлично! Вы выбрали дату " + date.name() +
                 ". \nА давайте теперь выберем свободное для вас время.";
         EditMessageText message = new EditMessageText();
         message.setChatId(String.valueOf(chatId));
         message.setMessageId((int) messageId);
         message.setText(text);
-        message.setReplyMarkup(getTimeslots());
+        message.setReplyMarkup(getTimeslots(date, customerService));
 
         try {
             execute(message);
@@ -231,11 +261,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private InlineKeyboardMarkup getTimeslots() {
+    private InlineKeyboardMarkup getTimeslots(DayOfWeek date, CustomerService service) {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
-        List<Timeslot> timeslots = timeslotService.getAll();
-
+        LocalDate today = LocalDate.now();
+        LocalDate getDayForBooking = today.with(TemporalAdjusters.nextOrSame(date));
+        List<Timeslot> timeslots = appointmentService.getAvailableTimeslots(getDayForBooking, service);
         List<InlineKeyboardButton> currentRow = new ArrayList<>();
         for (Timeslot timeslot : timeslots) {
             InlineKeyboardButton timeslotBtn = new InlineKeyboardButton();
@@ -276,14 +307,13 @@ public class TelegramBot extends TelegramLongPollingBot {
     private InlineKeyboardMarkup getDaysFoorBooking() {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<Schedule> schedules = scheduleService.getSchedules();
+        List<DayOfWeek> daysOfWeek = scheduleService.getDaysOfWeek();
 
         List<InlineKeyboardButton> currentRow = new ArrayList<>();
-        for (Schedule schedule : schedules) {
+        for (DayOfWeek day : daysOfWeek) {
             InlineKeyboardButton button = new InlineKeyboardButton();
-            button.setText(schedule.getDayOfWeek().toString());
-            button.setCallbackData(CallbackType.CHOOSE_TIMESLOT + "%" + schedule.getDayOfWeek());
-
+            button.setText(day.name());
+            button.setCallbackData(CallbackType.CHOOSE_TIMESLOT + "%" + day.name());
             currentRow.add(button);
 
             if (currentRow.size() == 2) {
@@ -435,17 +465,42 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<InlineKeyboardButton> answerList = new ArrayList<>();
         InlineKeyboardButton yesBtn = new InlineKeyboardButton();
         yesBtn.setText("Да");
-        yesBtn.setCallbackData(CallbackType.CONFIRM_APPOINTMENT + "%" + timeslot.getStartTime());
+        yesBtn.setCallbackData(CallbackType.APPOINTMENT_CREATED + "%" + timeslot.getStartTime());
 
         InlineKeyboardButton noBtn = new InlineKeyboardButton();
         noBtn.setText("Нет");
-        noBtn.setCallbackData(String.valueOf(CallbackType.DO_NOT_CONFIRM_APPOINTMENT));
+        noBtn.setCallbackData(String.valueOf(CallbackType.APPOINTMENT_NOT_CREATED));
+
         answerList.add(yesBtn);
         answerList.add(noBtn);
 
         rowsInline.add(answerList);
         markup.setKeyboard(rowsInline);
         return markup;
+    }
+
+    private void appointmentCreated(long chatId, long messageId,
+                                    Appointment appointment,
+                                    AppointmentTimeslot appointmentTimeslot){
+        EditMessageText messageText = new EditMessageText();
+        messageText.setChatId(String.valueOf(chatId));
+        messageText.setMessageId((int) messageId);
+        String[] randomUUID = UUID.randomUUID().toString().split("-");
+        String random = randomUUID[0];
+        String timeForBooking = appointmentTimeslot.getTimeslot().getStartTime() + " - " + appointmentTimeslot.getTimeslot().getEndTime();
+        messageText.setText("Запись №: " + random + " создана.\n"
+                + "Клиент: " + appointment.getClient().getName() + ".\n"
+                + "Услуга: " + appointment.getService().getName() + ".\n"
+                + "Дата: " + appointment.getDateOfBooking().toString() + ".\n"
+                + "Время: " + timeForBooking + ".\n"
+                + "До скорой встречи " + appointment.getClient().getName() + "!");
+
+        try{
+            execute(messageText);
+        } catch(TelegramApiException e){
+            System.out.println(e.getMessage());
+        }
+
     }
 
 

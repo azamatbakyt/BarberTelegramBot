@@ -51,7 +51,4 @@ public class ScheduleService {
         scheduleRepository.deleteById(id);
     }
 
-    public Schedule getScheduleByDayOfWeek(DayOfWeek dayOfWeek){
-        return scheduleRepository.findScheduleByDayOfWeek(dayOfWeek);
-    }
 }

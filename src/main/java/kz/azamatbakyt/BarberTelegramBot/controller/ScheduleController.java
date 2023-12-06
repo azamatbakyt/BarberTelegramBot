@@ -25,9 +25,10 @@ public class ScheduleController {
         this.timeslotService = timeslotService;
     }
 
+    //TODO
     @GetMapping
     public String getAll(Model model){
-        model.addAttribute("schedules", scheduleService.getSchedules());
+        model.addAttribute("schedulees", scheduleService.getSchedules());
 
         return "schedules/list";
     }
@@ -35,7 +36,7 @@ public class ScheduleController {
     @GetMapping("/new")
     public String getScheduleFrom(Model model){
         model.addAttribute("newSchedule", new Schedule());
-        model.addAttribute("daysOfWeek", scheduleService.getDaysOfWeek());
+        model.addAttribute("daysOfWeek", DayOfWeek.values());
         model.addAttribute("timeslots", timeslotService.getAll());
         return "schedules/form";
     }
@@ -51,7 +52,7 @@ public class ScheduleController {
     public String editSchedule(@PathVariable("id") Long id, Model model){
         model.addAttribute("scheduleToUpdate", scheduleService.getSchedule(id));
         model.addAttribute("timeslots", timeslotService.getAll());
-        model.addAttribute("daysOfWeek", scheduleService.getDaysOfWeek());
+        model.addAttribute("daysOfWeek", DayOfWeek.values());
         return "schedules/edit";
     }
 
