@@ -76,8 +76,11 @@
           method="post">
         <div class="form-group">
             <label for="day_of_week">Choose the correct day of week</label>
-            <input type="text" class="form-control" id="day_of_week" th:field="*{dayOfWeek}">
-
+            <select class="form-control" id="day_of_week" th:field="*{dayOfWeek}">
+                <option th:each="dayOfWeek : ${daysOfWeek}" th:value="${dayOfWeek}"
+                        th:text="${dayOfWeek}"></option>
+            </select>
+        </div>
             <div class="form-group">
                 <label for="start_time">Choose the correct time</label>
                 <select class="form-control" id="start_time" th:field="*{timeslot}">
@@ -89,7 +92,7 @@
 
             <button type="submit" class="btn btn-primary">Submit</button>
             <button type="reset" class="btn btn-secondary">Reset</button>
-        </div>
+
     </form>
 </div>
 </div>

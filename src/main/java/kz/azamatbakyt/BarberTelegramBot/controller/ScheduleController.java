@@ -2,13 +2,14 @@ package kz.azamatbakyt.BarberTelegramBot.controller;
 
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Schedule;
-import kz.azamatbakyt.BarberTelegramBot.helpers.DayOfWeek;
 import kz.azamatbakyt.BarberTelegramBot.service.ScheduleService;
 import kz.azamatbakyt.BarberTelegramBot.service.TimeslotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.DayOfWeek;
 
 
 @Controller
@@ -24,9 +25,10 @@ public class ScheduleController {
         this.timeslotService = timeslotService;
     }
 
+    //TODO
     @GetMapping
     public String getAll(Model model){
-        model.addAttribute("schedules", scheduleService.getSchedules());
+        model.addAttribute("schedulees", scheduleService.getSchedules());
 
         return "schedules/list";
     }
@@ -50,6 +52,7 @@ public class ScheduleController {
     public String editSchedule(@PathVariable("id") Long id, Model model){
         model.addAttribute("scheduleToUpdate", scheduleService.getSchedule(id));
         model.addAttribute("timeslots", timeslotService.getAll());
+        model.addAttribute("daysOfWeek", DayOfWeek.values());
         return "schedules/edit";
     }
 

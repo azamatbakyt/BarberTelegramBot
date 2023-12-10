@@ -4,9 +4,10 @@ package kz.azamatbakyt.BarberTelegramBot.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalTime;
+import java.util.Objects;
 
 @Entity
-@Table(name = "timeslots")
+@Table(name = "timeslot")
 public class Timeslot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +52,18 @@ public class Timeslot {
         this.endTime = endTime;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Timeslot timeslot = (Timeslot) o;
+        return Objects.equals(id, timeslot.id) && Objects.equals(startTime, timeslot.startTime) && Objects.equals(endTime, timeslot.endTime);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, startTime, endTime);
+    }
 
     @Override
     public String toString() {

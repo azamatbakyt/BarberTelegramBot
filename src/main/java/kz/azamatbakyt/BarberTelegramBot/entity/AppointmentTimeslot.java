@@ -2,31 +2,35 @@ package kz.azamatbakyt.BarberTelegramBot.entity;
 
 
 import jakarta.persistence.*;
-import java.time.DayOfWeek;
-
 
 @Entity
-@Table(name = "schedule")
-public class Schedule {
+@Table(name = "appointment_timeslot")
+public class AppointmentTimeslot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "day_of_week")
-    private DayOfWeek dayOfWeek;
+    @ManyToOne
+    @JoinColumn(name = "appointment_id", referencedColumnName = "id")
+    private Appointment appointment;
+
 
     @ManyToOne
     @JoinColumn(name = "timeslot_id", referencedColumnName = "id")
     private Timeslot timeslot;
 
-
-    public Schedule() {
+    public AppointmentTimeslot() {
     }
 
-    public Schedule(Long id, DayOfWeek dayOfWeek, Timeslot timeslot) {
+    public AppointmentTimeslot(Long id, Appointment appointment, Timeslot timeslot) {
         this.id = id;
-        this.dayOfWeek = dayOfWeek;
+        this.appointment = appointment;
+        this.timeslot = timeslot;
+    }
+
+    public AppointmentTimeslot(Appointment appointment, Timeslot timeslot) {
+        this.appointment = appointment;
         this.timeslot = timeslot;
     }
 
@@ -38,15 +42,13 @@ public class Schedule {
         this.id = id;
     }
 
-    public DayOfWeek getDayOfWeek() {
-        return dayOfWeek;
+    public Appointment getAppointment() {
+        return appointment;
     }
 
-    public void setDayOfWeek(DayOfWeek day_of_week) {
-        this.dayOfWeek = day_of_week;
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
     }
-
-
 
     public Timeslot getTimeslot() {
         return timeslot;
@@ -58,9 +60,9 @@ public class Schedule {
 
     @Override
     public String toString() {
-        return "Schedules{" +
+        return "AppointmentTimeslot{" +
                 "id=" + id +
-                ", day_of_week='" + dayOfWeek + '\'' +
+                ", appointment=" + appointment +
                 ", timeslot=" + timeslot +
                 '}';
     }

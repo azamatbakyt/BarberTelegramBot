@@ -94,13 +94,7 @@
                         th:text="${service.getName()}"></option>
             </select>
         </div>
-        <div class="form-group">
-            <label for="time">Choose the time</label>
-            <select class="form-control" id="time" th:field="*{timeslot}">
-                <option th:each="timeslot : ${timeslotsForAppointment}" th:value="${timeslot.id}"
-                        th:text="${timeslot.getStartTime()} + ' - ' + ${timeslot.getEndTime()}"></option>
-            </select>
-        </div>
+
 
 
         <button type="submit" class="btn btn-primary">Submit</button>
