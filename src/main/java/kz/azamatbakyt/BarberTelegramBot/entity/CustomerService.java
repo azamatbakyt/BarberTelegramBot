@@ -40,6 +40,13 @@ public class CustomerService{
         this.group = group;
     }
 
+    public CustomerService(String name, int price, int duration, CustomerServiceGroup group) {
+        this.name = name;
+        this.price = price;
+        this.duration = duration;
+        this.group = group;
+    }
+
     public Long getId() {
         return id;
     }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +29,16 @@ public class ScheduleService {
         return scheduleRepository.findAll();
     }
 
-    public List<DayOfWeek> getDaysOfWeek(){
-        List<DayOfWeek> daysOfWeek = new ArrayList<>();
+    public List<LocalDate> getDays(){
+        List<LocalDate> days = new ArrayList<>();
         LocalDate currendDate = LocalDate.now();
-        for (int i = 0; i < 7; i++) {
-            daysOfWeek.add(currendDate.getDayOfWeek().plus(i));
+        for (int i = 0; i < 14; i++) {
+            days.add(currendDate.plusDays(i));
         }
 
-        return daysOfWeek;
+
+
+        return days;
     }
 
     public void saveSchedule(Schedule schedule){
