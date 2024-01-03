@@ -10,7 +10,6 @@ import kz.azamatbakyt.BarberTelegramBot.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,18 +59,13 @@ public class AppointmentService {
                 .filter(t -> !bookedTimeslots.contains(t))
                 .collect(Collectors.toList());
 
-        final int duration = service.getDuration();
-        if (duration > 70) {
+        if (service.getDuration() > 70) {
             List<Timeslot> timeslotsFor2hourDuration = new ArrayList<>();
-            final int s = Math.round((float) duration / 60);
-            final int diff = s - 1;
+            final int s = Math.round((float) service.getDuration() / 60);
             for (int i = 0; i < availableTimeslots.size() - 1; i++) {
-                if (availableTimeslots.get(i + 1).getStartTime().equals( availableTimeslots.get(i).getEndTime()) ||
-                        (availableTimeslots.get(i + 1).getStartTime().getHour() - 1 == availableTimeslots.get(i).getEndTime().getHour())) {
-                    if ((availableTimeslots.get(i + 1).getEndTime().getHour() - availableTimeslots.get(i).getStartTime().getHour() == s) ||
-                            (availableTimeslots.get(i + 1).getEndTime().getHour() - availableTimeslots.get(i).getStartTime().getHour()) == 3) {
-                            timeslotsFor2hourDuration.add(availableTimeslots.get(i));
-                    }
+                if (availableTimeslots.get(i + 1).getStartTime().equals(availableTimeslots.get(i).getEndTime()) &&
+                        (availableTimeslots.get(i + 1).getEndTime().getHour() - availableTimeslots.get(i).getStartTime().getHour() == 2)) {
+                    timeslotsFor2hourDuration.add(availableTimeslots.get(i));
 
                 }
             }

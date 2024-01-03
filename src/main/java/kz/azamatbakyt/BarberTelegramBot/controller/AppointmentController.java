@@ -1,6 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.controller;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
+import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.service.AppointmentService;
 import kz.azamatbakyt.BarberTelegramBot.service.CSService;
 import kz.azamatbakyt.BarberTelegramBot.service.ClientService;
@@ -19,19 +20,21 @@ public class AppointmentController {
     private final ClientService clientService;
     private final CSService csService;
 
+    private final AppointmentTimeslotRepository appointmentTimeslotRepository;
     @Autowired
     public AppointmentController(AppointmentService appointmentService, TimeslotService timeslotService,
-                                 ClientService clientService, CSService csService) {
+                                 ClientService clientService, CSService csService, AppointmentTimeslotRepository appointmentTimeslotRepository) {
         this.appointmentService = appointmentService;
         this.timeslotService = timeslotService;
         this.clientService = clientService;
         this.csService = csService;
+        this.appointmentTimeslotRepository = appointmentTimeslotRepository;
     }
 
     @GetMapping
     public String getAppointments(Model model) {
         model.addAttribute("appointments", appointmentService.getAll());
-
+        model.addAttribute("timeslot", appointmentTimeslotRepository.findAll());
         return "appointments/list";
     }
 

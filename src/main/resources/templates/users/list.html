@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -36,7 +36,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
+        <a class="navbar-brand" href="#">Admin Panel</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -44,78 +44,57 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
+
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/services'}">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/groups'}">Service Groups</a>
+                    <a class="nav-link" th:href="${'/register'}">Add Employee</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/timeslots'}">Timeslots</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/schedules'}">Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/custom-schedules'}">Custom Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/clients'}">Clients</a>
+                    <a class="nav-link" th:href="${'/appointments'}">Service Panel</a>
                 </li>
 
-
-
-                <div sec:authorize="hasRole('ROLE_ADMIN')">
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="${'/users'}">Admin Panel</a>
-                    </li>
-                </div>
 
             </ul>
 
         </div>
-
         <button type="button" class="btn btn-primary">
             <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
         </button>
+
 
     </div>
 </nav>
 
 
-<div class="create-btn">
-    <button type="button" class="btn btn-primary">
-        <a style="color:white" class="nav-link" th:href="${'/appointments/new'}">Create a new appointment</a>
-    </button>
-</div>
+
 
 <div class="appointment-table">
     <table class="table table-bordered">
         <thead class="table-dark">
         <tr>
             <th scope="col">Id</th>
-            <th scope="col">Name</th>
-            <th scope="col">Service</th>
-            <th scope="col">Time</th>
-            <th scope="col">Date</th>
+            <th scope="col">Username</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">Role</th>
             <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="appointment : ${appointments}">
-            <td th:text="${appointment.getId()}"></td>
-            <td th:text="${appointment.getClient().getName()}"></td>
-            <td th:text="${appointment.getService().getName()}"></td>
-            <td th:text="${appointment.getDateOfBooking()}"></td>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.getId()}"></td>
+            <td th:text="${user.getUsername()}"></td>
+            <td th:text="${user.getPhoneNumber()}"></td>
+            <td th:text="${user.getRole().getRoleName()}"></td>
+
+
 
             <td>
                 <button type="button" class="btn btn-primary"><a style="color:white"
-                                                                 th:href="${'/appointments/' + appointment.id + '/edit'}">Edit</a>
+                                                                 th:href="${'/users/' + user.id + '/edit'}">Edit</a>
                 </button>
 
                 <button type="button" class="btn btn-danger"><a style="color:white"
-                                                                th:href="${'/appointments/' + appointment.id + '/delete'}">Delete</a>
+                                                                th:href="${'/users/' + user.id + '/delete'}">Delete</a>
                 </button>
             </td>
 
