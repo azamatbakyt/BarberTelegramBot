@@ -31,16 +31,14 @@
             font-weight: bold;
         }
 
-        .error-message {
-            color: #ff0000;
-        }
+
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
+        <a class="navbar-brand" href="#">Admin Panel</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -48,30 +46,27 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
+
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/services'}">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/groups'}">Service Groups</a>
+                    <a class="nav-link" th:href="${'/register'}">Add Employee</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/timeslots'}">Timeslots</a>
+                    <a class="nav-link" th:href="${'/appointments'}">Service Panel</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/schedules'}">Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/custom-schedules'}">Custom Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/clients'}">Clients</a>
-                </li>
+
+
             </ul>
 
         </div>
+        <button type="button" class="btn btn-primary">
+            <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
+        </button>
+
+
     </div>
 </nav>
+
 <div class="serviceGroup-editForm">
     <h1 class="mt-4">Editing the user info</h1>
     <form th:action="@{/users/{id}(id=${userToUpdate.getId()})}" th:object="${userToUpdate}"

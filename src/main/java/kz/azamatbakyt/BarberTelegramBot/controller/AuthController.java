@@ -39,7 +39,7 @@ public class AuthController {
     public String submitForm(@ModelAttribute User user, Model model) {
         model.addAttribute("user", user);
         userService.save(user);
-        return "appointments/list";
+        return "users/list";
     }
 
     @GetMapping("/logout")

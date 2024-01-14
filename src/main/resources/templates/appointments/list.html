@@ -29,6 +29,10 @@
             padding-right: 30px;
         }
 
+        .logout-btn{
+            height: 50px;
+            width: 60px;
+        }
 
     </style>
 </head>
@@ -64,6 +68,10 @@
                     <a class="nav-link" th:href="${'/clients'}">Clients</a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/portfolio'}">Portfolio</a>
+                </li>
+
 
 
                 <div sec:authorize="hasRole('ROLE_ADMIN')">
@@ -76,9 +84,12 @@
 
         </div>
 
-        <button type="button" class="btn btn-primary">
-            <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
-        </button>
+         <div class="logout-btn">
+             <button type="button" class="btn btn-primary">
+                 <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
+             </button>
+         </div>
+
 
     </div>
 </nav>

@@ -90,3 +90,10 @@ CREATE TABLE if not exists users
     phone_number  varchar(255) not null,
     UNIQUE (username)
     );
+
+create table if not exists portfolio(
+    id bigserial not null primary key,
+    bucket varchar(255) not null,
+    key varchar(255) not null,
+    unique(bucket, key)
+);

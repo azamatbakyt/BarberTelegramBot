@@ -16,12 +16,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final RoleRepository roleRepo;
 
-    @Autowired
-    public UserController(UserService userService, RoleRepository roleRepo) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.roleRepo = roleRepo;
     }
 
     @GetMapping

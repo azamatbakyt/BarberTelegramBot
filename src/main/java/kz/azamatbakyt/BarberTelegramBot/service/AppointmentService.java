@@ -10,7 +10,9 @@ import kz.azamatbakyt.BarberTelegramBot.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,20 +61,27 @@ public class AppointmentService {
                 .filter(t -> !bookedTimeslots.contains(t))
                 .collect(Collectors.toList());
 
-        if (service.getDuration() > 70) {
-            List<Timeslot> timeslotsFor2hourDuration = new ArrayList<>();
-            final int s = Math.round((float) service.getDuration() / 60);
-            for (int i = 0; i < availableTimeslots.size() - 1; i++) {
-                if (availableTimeslots.get(i + 1).getStartTime().equals(availableTimeslots.get(i).getEndTime()) &&
-                        (availableTimeslots.get(i + 1).getEndTime().getHour() - availableTimeslots.get(i).getStartTime().getHour() == 2)) {
-                    timeslotsFor2hourDuration.add(availableTimeslots.get(i));
-
+        if (service.getDuration() > Duration.ofHours(1).toMinutes()) {
+            final var result= new ArrayList<Timeslot>();
+            availableTimeslots.forEach(timeslot -> {
+                final var timeslotQty =  (int) Math.ceil((double) service.getDuration() / Duration.ofHours(1).toMinutes());                boolean isOk = true;
+                for (int i = 0; i < timeslotQty; i++) {
+                    if (isOk) {
+                        final LocalTime startTime = timeslot.getStartTime().plusHours(i);
+                        final LocalTime endTime = timeslot.getEndTime().plusHours(i);
+                        isOk = availableTimeslots.stream()
+                                .anyMatch(t -> t.getStartTime().equals(startTime) && t.getEndTime().equals(endTime));
+                    }
                 }
-            }
+                if (isOk) {
+                    result.trimToSize();
+                    result.add(timeslot);
+                }
+            });
+            return result;
+        }
 
-            return timeslotsFor2hourDuration;
-        } else
-            return availableTimeslots;
+        return availableTimeslots;
     }
 
     public List<Timeslot> getBookedTimeslotsOnDate(LocalDate date) {
