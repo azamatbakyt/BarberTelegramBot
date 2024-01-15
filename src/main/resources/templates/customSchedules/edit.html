@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Service Creating Form</title>
@@ -30,9 +30,11 @@
             font-weight: bold;
         }
 
-        .error-message {
-            color: #ff0000;
+        .logout-btn{
+            height: 50px;
+            width: 60px;
         }
+
     </style>
 </head>
 <body>
@@ -66,11 +68,33 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="${'/clients'}">Clients</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/portfolio'}">Portfolio</a>
+                </li>
+
+
+
+                <div sec:authorize="hasRole('ROLE_ADMIN')">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="${'/users'}">Admin Panel</a>
+                    </li>
+                </div>
+
             </ul>
 
         </div>
+
+        <div class="logout-btn">
+            <button type="button" class="btn btn-primary">
+                <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
+            </button>
+        </div>
+
+
     </div>
 </nav>
+
 <div class="customSchedule-editForm">
     <h1 class="mt-4">Editing the custom-schedule</h1>
     <form action="#" th:action="@{/custom-schedules/{id}(id=${customScheduleToUpdate.getId()})}"

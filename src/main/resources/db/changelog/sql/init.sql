@@ -1,5 +1,5 @@
 drop table if exists customer_service_group, customer_service, clients, timeslot,
-    schedule, appointment, custom_schedule, appointment_timeslot cascade;
+    schedule, appointment, custom_schedule, appointment_timeslot, role,users cascade;
 
 create table if not exists customer_service_group
 (
@@ -73,4 +73,27 @@ create table if not exists appointment_timeslot(
     appointment_id bigint not null references appointment(id) on delete cascade,
     timeslot_id bigint not null references timeslot(id) on delete cascade,
     unique(appointment_id, timeslot_id)
+);
+
+CREATE TABLE if not exists role
+(
+    id   BIGSERIAL    NOT NULL PRIMARY KEY,
+    role_name varchar(255) NOT NULL
+    );
+
+CREATE TABLE if not exists users
+(
+    id            BIGSERIAL    NOT NULL PRIMARY KEY,
+    role_id       int REFERENCES role (id) ON DELETE CASCADE,
+    username      varchar(255) NOT NULL,
+    password      varchar(255) NOT NULL,
+    phone_number  varchar(255) not null,
+    UNIQUE (username)
+    );
+
+create table if not exists portfolio(
+    id bigserial not null primary key,
+    bucket varchar(255) not null,
+    key varchar(255) not null,
+    unique(bucket, key)
 );

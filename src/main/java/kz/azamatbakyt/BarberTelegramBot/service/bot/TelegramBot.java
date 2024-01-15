@@ -2,6 +2,7 @@ package kz.azamatbakyt.BarberTelegramBot.service.bot;
 
 
 import com.vdurmont.emoji.EmojiParser;
+import jakarta.annotation.PostConstruct;
 import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
 import kz.azamatbakyt.BarberTelegramBot.entity.*;
 import kz.azamatbakyt.BarberTelegramBot.helpers.CallbackType;
@@ -9,12 +10,16 @@ import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
@@ -22,11 +27,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.time.DayOfWeek;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -52,6 +58,8 @@ public class TelegramBot extends TelegramLongPollingBot {
     private AppointmentService appointmentService;
     @Autowired
     private AppointmentTimeslotRepository appointmentTimeslotRepository;
+    @Autowired
+    private PortfolioService portfolioService;
     private final BotConfig config;
 
     private final static String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
@@ -74,6 +82,9 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private final static String ASK_PHONE = "А теперь пожалуйста напишите ваш номер телефона: ";
     private final static String REGISTRATION_SUCCESSFUL = "Спасибо! Регистрация прошла успешно.";
+    private final static String CANCEL_ACTION_TEXT = "Вы только что отменили действие! \nПрошу вас начните заново! \nСпасибо за ваше понимание!";
+    private final static String PORTFOLIO_TEXT = "Фотографии, как отражение души. " +
+            "Добро пожаловать в галерею моего творчества!";
 
     @Override
     public String getBotUsername() {
@@ -107,7 +118,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     client.setName(message);
                     sendMessage(chatId, ASK_PHONE, client.isRegistrationCompleted());
                     clientsService.save(client);
-                } else if (client.getPhone() == null) {
+                } else if (client.getPhone() == null && client.getPhone().contains("8")) {
                     client.setPhone(message);
                     client.setRegistrationCompleted(true);
                     sendMessage(chatId, REGISTRATION_SUCCESSFUL, true);
@@ -129,6 +140,14 @@ public class TelegramBot extends TelegramLongPollingBot {
                             break;
                         case "Услуги":
                             sendServices(chatId);
+                            break;
+                        case "Мои работы":
+                            try {
+                                sendMessage(chatId, PORTFOLIO_TEXT, true);
+                                showPortfolio(chatId);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                             break;
                     }
                 }
@@ -178,6 +197,8 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case APPOINTMENT_CREATED:
                     appointmentCreated(chatId, messageId, appointment, appointmentTimeslot);
                     break;
+                case CANCEL_ACTION:
+                    sendMessage(chatId, CANCEL_ACTION_TEXT, true);
             }
 
 
@@ -185,6 +206,17 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
+    @PostConstruct
+    private void commands() {
+        List<BotCommand> listOfCommands = new ArrayList<>();
+        listOfCommands.add(new BotCommand("/start", "Перезапустить бота"));
+
+        try {
+            this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     private void choiceService(long chatId, long messageId, CustomerService customerService) {
         String text = "Вы выбрали - " + customerService.getName() + ". \n" +
@@ -429,18 +461,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         InlineKeyboardMarkup markupIn = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
 
-        List<InlineKeyboardButton> answerList = new ArrayList<>();
-        InlineKeyboardButton yesBtn = new InlineKeyboardButton();
-        yesBtn.setText("Да");
-        yesBtn.setCallbackData(CallbackType.YES_FOR_CREATING_APPOINTMENT + "%" + customerService.getName());
+        rowsInline.add(
+                createAnswerKeyboard(
+                        CallbackType.YES_FOR_CREATING_APPOINTMENT + "%" + customerService.getName(),
+                        CallbackType.CANCEL_ACTION + "%" + customerService.getName()
+                )
 
-        InlineKeyboardButton noBtn = new InlineKeyboardButton();
-        noBtn.setText("Нет");
-        noBtn.setCallbackData(String.valueOf(CallbackType.NO_FOR_CREATING_APPOINTMENT));
-        answerList.add(yesBtn);
-        answerList.add(noBtn);
-
-        rowsInline.add(answerList);
+        );
         markupIn.setKeyboard(rowsInline);
         return markupIn;
     }
@@ -466,19 +493,11 @@ public class TelegramBot extends TelegramLongPollingBot {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
 
-        List<InlineKeyboardButton> answerList = new ArrayList<>();
-        InlineKeyboardButton yesBtn = new InlineKeyboardButton();
-        yesBtn.setText("Да");
-        yesBtn.setCallbackData(CallbackType.APPOINTMENT_CREATED + "%" + timeslot.getStartTime());
+        rowsInline.add(createAnswerKeyboard(
+                CallbackType.APPOINTMENT_CREATED + "%" + timeslot.getStartTime(),
+                CallbackType.CANCEL_ACTION + "%" + timeslot.getEndTime()
+        ));
 
-        InlineKeyboardButton noBtn = new InlineKeyboardButton();
-        noBtn.setText("Нет");
-        noBtn.setCallbackData(String.valueOf(CallbackType.APPOINTMENT_NOT_CREATED));
-
-        answerList.add(yesBtn);
-        answerList.add(noBtn);
-
-        rowsInline.add(answerList);
         markup.setKeyboard(rowsInline);
         return markup;
     }
@@ -507,5 +526,32 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     }
 
+    private void showPortfolio(long chatId) throws IOException {
+        List<byte[]> portfolioList = portfolioService.findAll();
+        for (byte[] data : portfolioList) {
+            File tempFile = File.createTempFile("abc", ".jpg");
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(data);
+                SendPhoto sendPhoto = new SendPhoto(String.valueOf(chatId), new InputFile(tempFile));
+                execute(sendPhoto);
+            } catch (TelegramApiException e) {
+                System.out.println(e.getMessage());
+            }
+
+        }
+
+    }
+
+    private List<InlineKeyboardButton> createAnswerKeyboard(String callback1, String callback2) {
+        InlineKeyboardButton yesBtn = new InlineKeyboardButton();
+        yesBtn.setText("Да");
+        yesBtn.setCallbackData(callback1);
+
+        InlineKeyboardButton noBtn = new InlineKeyboardButton();
+        noBtn.setText("Нет");
+        noBtn.setCallbackData(callback2);
+
+        return List.of(yesBtn, noBtn);
+    }
 
 }

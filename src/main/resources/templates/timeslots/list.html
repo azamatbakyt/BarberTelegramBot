@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -30,6 +30,11 @@
         .timeslot-table {
             padding-left: 30px;
             padding-right: 30px;
+        }
+
+        .logout-btn{
+            height: 50px;
+            width: 60px;
         }
     </style>
 </head>
@@ -64,12 +69,32 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="${'/clients'}">Clients</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/portfolio'}">Portfolio</a>
+                </li>
+
+
+
+                <div sec:authorize="hasRole('ROLE_ADMIN')">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="${'/users'}">Admin Panel</a>
+                    </li>
+                </div>
+
             </ul>
 
         </div>
+
+        <div class="logout-btn">
+            <button type="button" class="btn btn-primary">
+                <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
+            </button>
+        </div>
+
+
     </div>
 </nav>
-
 
 <div class="create-btn">
     <button type="button" class="btn btn-primary">

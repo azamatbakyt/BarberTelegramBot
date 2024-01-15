@@ -15,3 +15,10 @@ INSERT INTO customer_service (duration, name, price, customer_service_group_id) 
 INSERT INTO customer_service (duration, name, price, customer_service_group_id) VALUES (60, 'Окантовка', 2000, (select id from customer_service_group where name='Другие'));
 INSERT INTO customer_service (duration, name, price, customer_service_group_id) VALUES (60, 'Удаление волос воском', 1000, (select id from customer_service_group where name='Другие'));
 INSERT INTO customer_service (duration, name, price, customer_service_group_id) VALUES (60, 'Чистка лица(скраб+глина)', 2000, (select id from customer_service_group where name='Другие'));
+
+
+INSERT INTO role(role_name) VALUES ('ROLE_USER');
+INSERT INTO role(role_name) VALUES ('ROLE_ADMIN');
+
+INSERT INTO users(role_id, username, password,phone_number)
+VALUES ((select id from role where role_name = 'ROLE_ADMIN'), 'azamat', '$2a$10$wOk2EvzLK9ax4hLalLKjVegvW0HgWsDX25i/8cL0Td0OZE4OxrcmW', '05488');

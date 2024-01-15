@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Service Creating Form</title>
@@ -31,6 +31,10 @@
             font-weight: bold;
         }
 
+        .logout-btn {
+            height: 50px;
+            width: 60px;
+        }
 
     </style>
 </head>
@@ -65,11 +69,32 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="${'/clients'}">Clients</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/portfolio'}">Portfolio</a>
+                </li>
+
+
+                <div sec:authorize="hasRole('ROLE_ADMIN')">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="${'/users'}">Admin Panel</a>
+                    </li>
+                </div>
+
             </ul>
 
         </div>
+
+        <div class="logout-btn">
+            <button type="button" class="btn btn-primary">
+                <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
+            </button>
+        </div>
+
+
     </div>
 </nav>
+
 <div class="schedule-editForm">
     <h1 class="mt-4">Editing the schedule</h1>
     <form action="#" th:action="@{/schedules/{id}(id=${scheduleToUpdate.getId()})}" th:object="${scheduleToUpdate}"
@@ -81,17 +106,17 @@
                         th:text="${dayOfWeek}"></option>
             </select>
         </div>
-            <div class="form-group">
-                <label for="start_time">Choose the correct time</label>
-                <select class="form-control" id="start_time" th:field="*{timeslot}">
-                    <option th:each="timeslot : ${timeslots}" th:value="${timeslot.id}"
-                            th:text="${timeslot.getStartTime()} + ' - ' + ${timeslot.getEndTime()}"></option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label for="start_time">Choose the correct time</label>
+            <select class="form-control" id="start_time" th:field="*{timeslot}">
+                <option th:each="timeslot : ${timeslots}" th:value="${timeslot.id}"
+                        th:text="${timeslot.getStartTime()} + ' - ' + ${timeslot.getEndTime()}"></option>
+            </select>
+        </div>
 
 
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="reset" class="btn btn-secondary">Reset</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
 
     </form>
 </div>

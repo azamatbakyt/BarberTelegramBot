@@ -28,7 +28,7 @@ public class BarberTelegramBotApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		CustomerService service = csService.getServiceById(6L);
 		System.out.println(service.getName() + "=====" + service.getDuration());
-		List<Timeslot> timeslots = appointmentService.getAvailableTimeslots(LocalDate.parse("2023-12-18"), service);
+		List<Timeslot> timeslots = appointmentService.getAvailableTimeslots(LocalDate.parse("2024-01-05"), service);
 		for (Timeslot timeslot : timeslots) {
 			System.out.println(timeslot.getStartTime().toString() + " - " + timeslot.getEndTime().toString());
 		}
