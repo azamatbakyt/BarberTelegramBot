@@ -71,7 +71,7 @@ create table if not exists appointment(
 create table if not exists appointment_timeslot(
     id bigserial primary key,
     appointment_id bigint not null references appointment(id) on delete cascade,
-    timeslot_id bigint not null references timeslot(id) on delete cascade,
+    timeslot_id bigint references timeslot(id) on delete cascade,
     unique(appointment_id, timeslot_id)
 );
 

@@ -41,6 +41,11 @@ public class Appointment {
         this.dateOfBooking = dateOfBooking;
     }
 
+    public Appointment(Client client, CustomerService service) {
+        this.client = client;
+        this.service = service;
+    }
+
     public Long getId() {
         return id;
     }

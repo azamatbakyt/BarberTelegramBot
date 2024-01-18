@@ -131,4 +131,21 @@ public class AppointmentService {
     public void delete(Long id) {
         appointmentRepository.deleteById(id);
     }
+
+    public void updateAppointment(Appointment appointment){
+        Appointment appointmentToUpdate = getAppointment(appointment.getId());
+        if (appointmentToUpdate != null){
+            appointmentToUpdate.setDateOfBooking(appointment.getDateOfBooking());
+            appointmentRepository.save(appointmentToUpdate);
+        } else{
+            throw new EntityNotFoundException("Запись не найдена");
+        }
+    }
+
+    public Appointment getAppointmentByChatId(Long chatId){
+        return appointmentRepository.findByChatId(String.valueOf(chatId));
+    }
+
+
+
 }

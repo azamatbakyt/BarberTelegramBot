@@ -6,7 +6,6 @@ import jakarta.annotation.PostConstruct;
 import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
 import kz.azamatbakyt.BarberTelegramBot.entity.*;
 import kz.azamatbakyt.BarberTelegramBot.helpers.CallbackType;
-import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +56,9 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Autowired
     private AppointmentService appointmentService;
     @Autowired
-    private AppointmentTimeslotRepository appointmentTimeslotRepository;
-    @Autowired
     private PortfolioService portfolioService;
+    @Autowired
+    private AppointmentTimeslotService appointmentTimeslotService;
     private final BotConfig config;
 
     private final static String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
@@ -96,9 +95,6 @@ public class TelegramBot extends TelegramLongPollingBot {
         return config.getToken();
     }
 
-    private String callbackService = null;
-    private final Appointment appointment = new Appointment();
-    private final AppointmentTimeslot appointmentTimeslot = new AppointmentTimeslot();
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -118,21 +114,19 @@ public class TelegramBot extends TelegramLongPollingBot {
                     client.setName(message);
                     sendMessage(chatId, ASK_PHONE, client.isRegistrationCompleted());
                     clientsService.save(client);
-                } else if (client.getPhone() == null && client.getPhone().contains("8")) {
+                } else if (client.getPhone() == null) {
                     client.setPhone(message);
                     client.setRegistrationCompleted(true);
                     sendMessage(chatId, REGISTRATION_SUCCESSFUL, true);
                     clientsService.save(client);
                     String answer = EmojiParser.parseToUnicode("Добро пожаловать, " + client.getName()
-                            + ", что я могу вам предложить!" + "\uD83D\uDE0A");
+                            + ", что я могу вам предложить!" + "\uD83D\uDE0A" );
                     sendMessage(chatId, answer, true);
-                    appointment.setClient(client);
                 } else {
                     switch (message) {
                         case "/start":
                             String answer = EmojiParser.parseToUnicode("И снова здравствуйте, " + client.getName()
-                                    + ", что я могу вам предложить!" + "\uD83D\uDE0A");
-                            appointment.setClient(client);
+                                    + ", что я могу вам предложить!" + "\uD83D\uDE0A" );
                             sendMessage(chatId, answer, true);
                             break;
                         case "Help":
@@ -155,7 +149,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         } else if (update.hasCallbackQuery()) {
             String callback = update.getCallbackQuery().getData();
-            String[] callbackData = callback.split("%");
+            String[] callbackData = callback.split("%" );
             CallbackType callbackType = CallbackType.valueOf(callbackData[0]);
             String callbackName = callbackData[1];
             long messageId = update.getCallbackQuery().getMessage().getMessageId();
@@ -166,37 +160,49 @@ public class TelegramBot extends TelegramLongPollingBot {
                     CustomerServiceGroup group = customerServiceGroupService.getServiceGroupByName(callbackName);
                     choiceServiceGroup(chatId, messageId, group);
                     break;
+
                 case SERVICE:
                     CustomerService service = csService.getServiceByName(callbackName);
                     choiceService(chatId, messageId, service);
-                    appointment.setService(service);
-
                     break;
+
                 case YES_FOR_CREATING_APPOINTMENT:
                     CustomerService serviceForBooking = csService.getServiceByName(callbackName);
-                    callbackService = serviceForBooking.getName();
+                    // Перегрузил конструктор Appointment(Client, CustomerService)
+                    appointmentService.save(new Appointment(clientsService.getClientByChatId(chatId), serviceForBooking));
                     choiceDayForBooking(chatId, messageId, serviceForBooking);
                     break;
+
                 case CHOOSE_TIMESLOT:
                     LocalDate dayForBooking = LocalDate.parse(callbackName);
-                    appointment.setDateOfBooking(dayForBooking);
-                    CustomerService serviceBeforeMakingAppointment = csService.getServiceByName(callbackService);
-                    choiceTimeslot(chatId, messageId, dayForBooking, serviceBeforeMakingAppointment);
-                    appointmentService.save(appointment);
-                    appointmentTimeslot.setAppointment(appointment);
+                    Appointment appointmentToUpdate = appointmentService.getAppointmentByChatId(chatId);
+                    appointmentToUpdate.setDateOfBooking(dayForBooking);
+                    choiceTimeslot(chatId, messageId, dayForBooking, appointmentToUpdate.getService());
+                    appointmentService.updateAppointment(appointmentToUpdate);
+                    appointmentTimeslotService.save(
+                            List.of(
+                                    new AppointmentTimeslot(appointmentToUpdate, new Timeslot())
+                            )
+                    );
                     break;
+
                 case MAKE_APPOINTMENT:
                     Timeslot timeslot = timeslotService.getTimeslotByStartTime(LocalTime.parse(callbackName));
                     confirmAppointment(chatId, messageId, timeslot);
-                    appointmentTimeslot.setTimeslot(timeslot);
-                    System.out.println(appointment.getClient().getName());
-                    System.out.println(appointment.getService().getName());
-                    System.out.println(appointment.getDateOfBooking().toString());
-                    appointmentTimeslotRepository.save(appointmentTimeslot);
+                    appointmentTimeslotService.update(timeslot, appointmentService.getAppointmentByChatId(chatId));
                     break;
+
                 case APPOINTMENT_CREATED:
-                    appointmentCreated(chatId, messageId, appointment, appointmentTimeslot);
+                    appointmentCreated(
+                            chatId,
+                            messageId,
+                            appointmentService.getAppointmentByChatId(chatId),
+                            appointmentTimeslotService.getAppointmentTimeslot(
+                                    appointmentService.getAppointmentByChatId(chatId)
+                            )
+                    );
                     break;
+
                 case CANCEL_ACTION:
                     sendMessage(chatId, CANCEL_ACTION_TEXT, true);
             }
@@ -209,7 +215,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @PostConstruct
     private void commands() {
         List<BotCommand> listOfCommands = new ArrayList<>();
-        listOfCommands.add(new BotCommand("/start", "Перезапустить бота"));
+        listOfCommands.add(new BotCommand("/start", "Перезапустить бота" ));
 
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
@@ -227,7 +233,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setText(text + "\n" + "Услуга: " + customerService.getName() + "\n" +
                 "Цена: " + customerService.getPrice() + "\n" +
                 "Длительность: " + customerService.getDuration() + "\n" +
-                "Вы хотите заказать эту услугу?");
+                "Вы хотите заказать эту услугу?" );
         message.setReplyMarkup(getTimeslotsAfterServices(customerService));
         try {
             execute(message);
@@ -281,7 +287,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void choiceTimeslot(long chatId, long messageId, LocalDate date, CustomerService customerService) {
-        String formattedDay = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        String formattedDay = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy" ));
         String text = "Отлично! Вы выбрали дату " + formattedDay +
                 ". \nА давайте теперь выберем свободное для вас время.";
         EditMessageText message = new EditMessageText();
@@ -347,7 +353,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         for (LocalDate day : days) {
             InlineKeyboardButton button = new InlineKeyboardButton();
-            String formattedDay = day.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+            String formattedDay = day.format(DateTimeFormatter.ofPattern("dd MMMM yyyy" ));
             button.setText(formattedDay);
             button.setCallbackData(CallbackType.CHOOSE_TIMESLOT + "%" + day);
             currentRow.add(button);
@@ -416,12 +422,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<KeyboardRow> rows = new ArrayList<>();
         KeyboardRow row = new KeyboardRow();
 
-        row.add("Услуги");
-        row.add("Мои работы");
+        row.add("Услуги" );
+        row.add("Мои работы" );
         rows.add(row);
 
         row = new KeyboardRow();
-        row.add("Гайды");
+        row.add("Гайды" );
         rows.add(row);
 
         keyboard.setKeyboard(rows);
@@ -508,15 +514,15 @@ public class TelegramBot extends TelegramLongPollingBot {
         EditMessageText messageText = new EditMessageText();
         messageText.setChatId(String.valueOf(chatId));
         messageText.setMessageId((int) messageId);
-        String[] randomUUID = UUID.randomUUID().toString().split("-");
+        String[] randomUUID = UUID.randomUUID().toString().split("-" );
         String random = randomUUID[0];
         String timeForBooking = appointmentTimeslot.getTimeslot().getStartTime() + " - " + appointmentTimeslot.getTimeslot().getEndTime();
         messageText.setText("Запись №: " + random + " создана.\n"
                 + "Клиент: " + appointment.getClient().getName() + ".\n"
                 + "Услуга: " + appointment.getService().getName() + ".\n"
-                + "Дата: " + appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + ".\n"
+                + "Дата: " + appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy" )) + ".\n"
                 + "Время: " + timeForBooking + ".\n"
-                + "До скорой встречи " + appointment.getClient().getName() + "!");
+                + "До скорой встречи " + appointment.getClient().getName() + "!" );
 
         try {
             execute(messageText);
@@ -529,7 +535,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     private void showPortfolio(long chatId) throws IOException {
         List<byte[]> portfolioList = portfolioService.findAll();
         for (byte[] data : portfolioList) {
-            File tempFile = File.createTempFile("abc", ".jpg");
+            File tempFile = File.createTempFile("abc", ".jpg" );
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 fos.write(data);
                 SendPhoto sendPhoto = new SendPhoto(String.valueOf(chatId), new InputFile(tempFile));
@@ -544,11 +550,11 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private List<InlineKeyboardButton> createAnswerKeyboard(String callback1, String callback2) {
         InlineKeyboardButton yesBtn = new InlineKeyboardButton();
-        yesBtn.setText("Да");
+        yesBtn.setText("Да" );
         yesBtn.setCallbackData(callback1);
 
         InlineKeyboardButton noBtn = new InlineKeyboardButton();
-        noBtn.setText("Нет");
+        noBtn.setText("Нет" );
         noBtn.setCallbackData(callback2);
 
         return List.of(yesBtn, noBtn);
