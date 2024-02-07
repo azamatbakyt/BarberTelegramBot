@@ -25,6 +25,7 @@ public class AppointmentService {
     private final CustomScheduleRepository customScheduleRepository;
     private final ScheduleRepository scheduleRepository;
 
+
     @Autowired
     public AppointmentService(AppointmentRepository appointmentRepository,
                               AppointmentTimeslotRepository appointmentTimeslotRepository,
@@ -62,9 +63,10 @@ public class AppointmentService {
                 .collect(Collectors.toList());
 
         if (service.getDuration() > Duration.ofHours(1).toMinutes()) {
-            final var result= new ArrayList<Timeslot>();
+            final var result = new ArrayList<Timeslot>();
             availableTimeslots.forEach(timeslot -> {
-                final var timeslotQty =  (int) Math.ceil((double) service.getDuration() / Duration.ofHours(1).toMinutes());                boolean isOk = true;
+                final var timeslotQty = (int) Math.ceil((double) service.getDuration() / Duration.ofHours(1).toMinutes());
+                boolean isOk = true;
                 for (int i = 0; i < timeslotQty; i++) {
                     if (isOk) {
                         final LocalTime startTime = timeslot.getStartTime().plusHours(i);
@@ -108,12 +110,7 @@ public class AppointmentService {
         }
     }
 
-    public void createAppointment(
-            CustomerService service,
-            LocalDate date,
-            Client client) {
-        appointmentRepository.save(new Appointment(client, service, date));
-    }
+
 
     public List<Appointment> getAll() {
         return appointmentRepository.findAll();
@@ -125,6 +122,7 @@ public class AppointmentService {
     }
 
     public void save(Appointment appointment) {
+        appointment.setCreated(false);
         appointmentRepository.save(appointment);
     }
 
@@ -132,20 +130,27 @@ public class AppointmentService {
         appointmentRepository.deleteById(id);
     }
 
-    public void updateAppointment(Appointment appointment){
-        Appointment appointmentToUpdate = getAppointment(appointment.getId());
-        if (appointmentToUpdate != null){
-            appointmentToUpdate.setDateOfBooking(appointment.getDateOfBooking());
-            appointmentRepository.save(appointmentToUpdate);
-        } else{
-            throw new EntityNotFoundException("Запись не найдена");
-        }
-    }
-
-    public Appointment getAppointmentByChatId(Long chatId){
-        return appointmentRepository.findByChatId(String.valueOf(chatId));
+    public Appointment updateDateOfBookingByChatId(Long chatId, LocalDate newDateOfBook) {
+        Appointment appointmentToUpdate = appointmentRepository.findAllByChatId(chatId);
+        appointmentToUpdate.setDateOfBooking(newDateOfBook);
+        return appointmentRepository.save(appointmentToUpdate);
+        // Appointment is completed now
     }
 
 
 
+    public Appointment getNotCreatedAppointmentByChatId(Long chatId) {
+        return appointmentRepository.findByChatId(chatId);
+    }
+
+    public void setAppointmentCreated(Long chatId){
+        Appointment appointment = getNotCreatedAppointmentByChatId(chatId);
+        appointment.setCreated(true);
+        appointmentRepository.save(appointment);
+    }
+
+
+    public List<Appointment> getActiveAppointments(Long chatId){
+        return appointmentRepository.findAllByCreatedAppointment(chatId);
+    }
 }

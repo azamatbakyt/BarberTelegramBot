@@ -47,4 +47,11 @@ public class TimeslotService {
         return timeslotRepository.findTimeslotByStartTime(startTime);
     }
 
+    public List<Timeslot> getTimeslots(List<LocalTime> times){
+        return timeslotRepository.findAllByStartTimeIn(times);
+    }
+
+    public List<Timeslot> getAllActiveTimeslotByChatId(Long chatId){
+        return timeslotRepository.findAllActiveTimeslots(chatId);
+    }
 }

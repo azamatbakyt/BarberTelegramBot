@@ -2,10 +2,7 @@ package kz.azamatbakyt.BarberTelegramBot.controller;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
-import kz.azamatbakyt.BarberTelegramBot.service.AppointmentService;
-import kz.azamatbakyt.BarberTelegramBot.service.CSService;
-import kz.azamatbakyt.BarberTelegramBot.service.ClientService;
-import kz.azamatbakyt.BarberTelegramBot.service.TimeslotService;
+import kz.azamatbakyt.BarberTelegramBot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,21 +17,22 @@ public class AppointmentController {
     private final ClientService clientService;
     private final CSService csService;
 
-    private final AppointmentTimeslotRepository appointmentTimeslotRepository;
+    private final AppointmentTimeslotService appointmentTimeslotService;
     @Autowired
     public AppointmentController(AppointmentService appointmentService, TimeslotService timeslotService,
-                                 ClientService clientService, CSService csService, AppointmentTimeslotRepository appointmentTimeslotRepository) {
+                                 ClientService clientService, CSService csService, AppointmentTimeslotService appointmentTimeslotService) {
         this.appointmentService = appointmentService;
         this.timeslotService = timeslotService;
         this.clientService = clientService;
         this.csService = csService;
-        this.appointmentTimeslotRepository = appointmentTimeslotRepository;
+
+        this.appointmentTimeslotService = appointmentTimeslotService;
     }
 
     @GetMapping
     public String getAppointments(Model model) {
-        model.addAttribute("appointments", appointmentService.getAll());
-        model.addAttribute("timeslot", appointmentTimeslotRepository.findAll());
+        model.addAttribute("appointments", appointmentTimeslotService.getAll());
+
         return "appointments/list";
     }
 

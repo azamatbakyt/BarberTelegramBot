@@ -1,6 +1,5 @@
 package kz.azamatbakyt.BarberTelegramBot.service;
 
-import jakarta.transaction.Transactional;
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.AppointmentTimeslot;
 import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
@@ -15,29 +14,41 @@ public class AppointmentTimeslotService {
 
     private final AppointmentTimeslotRepository appointmentTimeslotRepository;
     private final TimeslotService timeslotService;
+
     @Autowired
     public AppointmentTimeslotService(AppointmentTimeslotRepository appointmentTimeslotRepository, TimeslotService timeslotService) {
         this.appointmentTimeslotRepository = appointmentTimeslotRepository;
         this.timeslotService = timeslotService;
     }
 
-    @Transactional
-    public void save(List<AppointmentTimeslot> appointmentTimeslotList){
+    public List<AppointmentTimeslot> getAll(){
+        return appointmentTimeslotRepository.findAll();
+    }
+
+    public void save(List<AppointmentTimeslot> appointmentTimeslotList) {
         appointmentTimeslotRepository.saveAll(appointmentTimeslotList);
     }
 
-    public AppointmentTimeslot getAppointmentTimeslot(Appointment appointment){
+    public AppointmentTimeslot getAppointmentTimeslot(Appointment appointment) {
         return appointmentTimeslotRepository.findAppointmentTimeslotByAppointmentId(appointment.getId());
     }
 
-    public void update(Timeslot timeslot, Appointment appointment){
-        AppointmentTimeslot appointmentTimeslot = getAppointmentTimeslot(appointment);
-        if (appointmentTimeslot != null){
-            appointmentTimeslot.setTimeslot(timeslot);
-            appointmentTimeslotRepository.save(appointmentTimeslot);
-        }
+
+
+    public List<AppointmentTimeslot> getListAT(Long id){
+        return appointmentTimeslotRepository.findAllByAppointmentId(id);
     }
 
+
+    public void update(List<Timeslot> timeslots, Appointment appointment) {
+        List<AppointmentTimeslot> appointmentTimeslotList = getListAT(appointment.getId());
+        for (int i = 0; i < timeslots.size(); i++) {
+            appointmentTimeslotList.get(i).setTimeslot(timeslots.get(i));
+            appointmentTimeslotList.get(i).setAppointment(appointment);
+        }
+        appointmentTimeslotRepository.saveAll(appointmentTimeslotList);
+
+    }
 
 
 }

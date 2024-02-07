@@ -25,14 +25,21 @@ public class Appointment {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateOfBooking;
-
+    // TODO Boolean class to use
+    private Boolean isCreated;
     public Appointment() {}
 
-    public Appointment(Long id, Client client, CustomerService service, LocalDate dateOfBooking) {
+
+    public Appointment(Long id,
+                       Client client,
+                       CustomerService service,
+                       LocalDate dateOfBooking,
+                       Boolean isCreated){
         this.id = id;
         this.client = client;
         this.service = service;
         this.dateOfBooking = dateOfBooking;
+        this.isCreated = isCreated;
     }
 
     public Appointment(Client client, CustomerService service, LocalDate dateOfBooking) {
@@ -82,13 +89,22 @@ public class Appointment {
         this.dateOfBooking = dateOfBooking;
     }
 
+    public Boolean getCreated() {
+        return isCreated;
+    }
+
+    public void setCreated(Boolean created) {
+        isCreated = created;
+    }
+
     @Override
     public String toString() {
-        return "Appointments{" +
+        return "Appointment{" +
                 "id=" + id +
                 ", client=" + client +
                 ", service=" + service +
-                ", date_of_booking=" + dateOfBooking +
+                ", dateOfBooking=" + dateOfBooking +
+                ", isCreated=" + isCreated +
                 '}';
     }
 }
