@@ -17,6 +17,6 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long> {
                     "join appointment_timeslot on timeslot.id = appointment_timeslot.timeslot_id " +
                     "join appointment on appointment_timeslot.appointment_id = appointment.id " +
                     "join client on appointment.client_id = client.id " +
-                    "where appointment.is_created=true and chat_id = ?")
+                    "where appointment.status='BOOKING_SUCCESSFUL' and chat_id = ?")
     List<Timeslot> findAllActiveTimeslots(Long chatId);
 }

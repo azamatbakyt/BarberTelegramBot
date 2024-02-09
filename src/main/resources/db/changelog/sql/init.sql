@@ -66,7 +66,7 @@ create table if not exists appointment(
     client_id bigint not null references client(id) on delete cascade,
     service_id bigint not null references customer_service(id) on delete cascade,
     date_of_booking DATE,
-    is_created boolean default false
+    status varchar(255)
 );
 
 create table if not exists appointment_timeslot(

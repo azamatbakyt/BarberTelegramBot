@@ -1,6 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.entity;
 
 import jakarta.persistence.*;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -25,8 +26,9 @@ public class Appointment {
     @Temporal(TemporalType.DATE)
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateOfBooking;
-    // TODO Boolean class to use
-    private Boolean isCreated;
+
+    private String status;
+
     public Appointment() {}
 
 
@@ -34,23 +36,26 @@ public class Appointment {
                        Client client,
                        CustomerService service,
                        LocalDate dateOfBooking,
-                       Boolean isCreated){
+                       String status){
         this.id = id;
         this.client = client;
         this.service = service;
         this.dateOfBooking = dateOfBooking;
-        this.isCreated = isCreated;
+        this.status = status;
+
     }
 
-    public Appointment(Client client, CustomerService service, LocalDate dateOfBooking) {
+    public Appointment(Client client, CustomerService service, LocalDate dateOfBooking, String status) {
         this.client = client;
         this.service = service;
         this.dateOfBooking = dateOfBooking;
+        this.status = status;
     }
 
-    public Appointment(Client client, CustomerService service) {
+    public Appointment(Client client, CustomerService service, String status) {
         this.client = client;
         this.service = service;
+        this.status = status;
     }
 
     public Long getId() {
@@ -89,12 +94,13 @@ public class Appointment {
         this.dateOfBooking = dateOfBooking;
     }
 
-    public Boolean getCreated() {
-        return isCreated;
+
+    public String getStatus() {
+        return status;
     }
 
-    public void setCreated(Boolean created) {
-        isCreated = created;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
@@ -104,7 +110,6 @@ public class Appointment {
                 ", client=" + client +
                 ", service=" + service +
                 ", dateOfBooking=" + dateOfBooking +
-                ", isCreated=" + isCreated +
                 '}';
     }
 }

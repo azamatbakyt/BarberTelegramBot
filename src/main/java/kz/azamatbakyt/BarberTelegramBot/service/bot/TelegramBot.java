@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
 import kz.azamatbakyt.BarberTelegramBot.entity.*;
 import kz.azamatbakyt.BarberTelegramBot.helpers.CallbackType;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,13 +187,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 case YES_FOR_CREATING_APPOINTMENT:
                     CustomerService serviceForBooking = csService.getServiceByName(callbackName);
-                    appointmentService.save(new Appointment(clientsService.getClientByChatId(chatId), serviceForBooking));
+                    appointmentService.save(new Appointment(clientsService.getClientByChatId(chatId), serviceForBooking, Status.SERVICE_SELECTED.toString()));
                     choiceDayForBooking(chatId, messageId, serviceForBooking);
                     break;
 
                 case CHOOSE_TIMESLOT:
                     LocalDate dayForBooking = LocalDate.parse(callbackName);
-                    Appointment appointment = appointmentService.updateDateOfBookingByChatId(chatId, dayForBooking);
+                    Appointment appointment = appointmentService.updateDateOfBookingByChatId(chatId, dayForBooking, Status.DATE_SELECTED);
                     appointmentTimeslotService.save(
                             List.of(
                                     new AppointmentTimeslot(appointment, null)
@@ -205,7 +206,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case MAKE_APPOINTMENT:
                     LocalTime parsedTimeslot = LocalTime.parse(callbackName);
                     List<LocalTime> times = new ArrayList<>();
-                    Appointment appointmentByChatId = appointmentService.getNotCreatedAppointmentByChatId(chatId);
+                    Appointment appointmentByChatId = appointmentService.getNotCreatedAppointmentByChatId(chatId, Status.DATE_SELECTED);
                     int duration = appointmentByChatId.getService().getDuration();
                     int timeslotQty = duration / 60;
                     for (int i = 0; i < timeslotQty; i++) {
@@ -223,11 +224,10 @@ public class TelegramBot extends TelegramLongPollingBot {
                     Timeslot timeslot = timeslots.get(0);
                     confirmAppointment(chatId, messageId, timeslot);
                     appointmentTimeslotService.update(timeslots, appointmentByChatId);
-                    appointmentService.setAppointmentCreated(chatId);
-                    break;
+                    appointmentService.updateAppointmnetByStatus(chatId, Status.DATE_SELECTED, Status.TIMESLOT_SELECTED);                    break;
 
                 case APPOINTMENT_CREATED:
-
+                    appointmentService.updateAppointmnetByStatus(chatId, Status.TIMESLOT_SELECTED, Status.BOOKING_SUCCESSFUL);
                     showAllActiveAppointments(chatId, messageId, appointmentService.getActiveAppointments(chatId));
                     sendMessage(chatId, "Во избежания ошибок при повторном бронировании " +
                             "прошу вас перезапустить бота с помощью кнопки 'Перезапустить бота'", true);

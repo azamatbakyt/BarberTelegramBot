@@ -18,7 +18,7 @@ public interface AppointmentTimeslotRepository extends JpaRepository<Appointment
                     "join appointment on appointment_timeslot.appointment_id = appointment.id " +
                     "join timeslot on appointment_timeslot.timeslot_id = timeslot.id " +
                     "join client on appointment.client_id = client.id " +
-                    "where client.chat_id=? and appointment.is_created=true")
+                    "where client.chat_id=? and appointment.status='BOOKING_SUCCESSFUL'")
     List<AppointmentTimeslot> findAllByChatId(Long chatId);
     AppointmentTimeslot findAllById(Long id);
 }

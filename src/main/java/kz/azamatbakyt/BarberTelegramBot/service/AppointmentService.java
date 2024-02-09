@@ -3,6 +3,7 @@ package kz.azamatbakyt.BarberTelegramBot.service;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.*;
 import kz.azamatbakyt.BarberTelegramBot.exception.EntityNotFoundException;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentRepository;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomScheduleRepository;
@@ -122,7 +123,6 @@ public class AppointmentService {
     }
 
     public void save(Appointment appointment) {
-        appointment.setCreated(false);
         appointmentRepository.save(appointment);
     }
 
@@ -130,22 +130,29 @@ public class AppointmentService {
         appointmentRepository.deleteById(id);
     }
 
-    public Appointment updateDateOfBookingByChatId(Long chatId, LocalDate newDateOfBook) {
-        Appointment appointmentToUpdate = appointmentRepository.findAllByChatId(chatId);
+    public Appointment updateDateOfBookingByChatId(Long chatId, LocalDate newDateOfBook, Status statusToUpdate) {
+        Appointment appointmentToUpdate = appointmentRepository.findAllByStatusAndAndClientChatId(chatId, Status.SERVICE_SELECTED.toString());
         appointmentToUpdate.setDateOfBooking(newDateOfBook);
+        appointmentToUpdate.setStatus(statusToUpdate.toString());
         return appointmentRepository.save(appointmentToUpdate);
         // Appointment is completed now
     }
 
-
-
-    public Appointment getNotCreatedAppointmentByChatId(Long chatId) {
-        return appointmentRepository.findByChatId(chatId);
+    public void updateAppointmnetByStatus(Long chatId, Status statusBefore, Status statusAfter){
+        Appointment appointment = appointmentRepository.findAllByStatusAndAndClientChatId(chatId, statusBefore.toString());
+        appointment.setStatus(statusAfter.toString());
+        appointmentRepository.save(appointment);
     }
 
-    public void setAppointmentCreated(Long chatId){
-        Appointment appointment = getNotCreatedAppointmentByChatId(chatId);
-        appointment.setCreated(true);
+
+
+    public Appointment getNotCreatedAppointmentByChatId(Long chatId, Status status) {
+        return appointmentRepository.findByChatId(chatId, status.toString());
+    }
+
+    public void setAppointmentCreated(Long chatId, Status status){
+        Appointment appointment = getNotCreatedAppointmentByChatId(chatId, status);
+        appointment.setStatus(status.toString());
         appointmentRepository.save(appointment);
     }
 
