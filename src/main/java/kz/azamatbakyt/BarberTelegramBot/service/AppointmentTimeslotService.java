@@ -50,5 +50,13 @@ public class AppointmentTimeslotService {
 
     }
 
+    public List<AppointmentTimeslot> getAllActiveBookings(Long chatId){
+        return appointmentTimeslotRepository.findAllByChatId(chatId);
+    }
+
+    public AppointmentTimeslot getAllById(Long id){
+        return appointmentTimeslotRepository.findAllById(id);
+    }
+
 
 }

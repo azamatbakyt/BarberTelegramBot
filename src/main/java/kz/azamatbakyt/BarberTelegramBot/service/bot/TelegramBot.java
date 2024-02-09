@@ -33,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -71,6 +72,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
 
     private final static String ALL_SERVICES = "What service would you want to choose?";
+
+    private final static String BARBER_PHONE_NUMBER = "Номер телефона: +7(747) 917-73-66";
 
     public TelegramBot(BotConfig config) {
         this.config = config;
@@ -146,6 +149,17 @@ public class TelegramBot extends TelegramLongPollingBot {
                                 throw new RuntimeException(e);
                             }
                             break;
+                        case "Мои активные записи":
+                            sendAllActiveAppointments(chatId, appointmentService.getActiveAppointments(chatId));
+                            sendMessage(chatId, "Во избежания ошибок при повторном бронировании " +
+                                    "прошу вас перезапустить бота с помощью кнопки 'Перезапустить бота'", true);
+                            break;
+                        case "Связаться с барбером":
+                            sendMessage(chatId, BARBER_PHONE_NUMBER, true);
+                            break;
+                        case "Управление бронированием":
+                            appointmentManagement(chatId);
+                            break;
                     }
                 }
             }
@@ -215,8 +229,18 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case APPOINTMENT_CREATED:
 
                     showAllActiveAppointments(chatId, messageId, appointmentService.getActiveAppointments(chatId));
+                    sendMessage(chatId, "Во избежания ошибок при повторном бронировании " +
+                            "прошу вас перезапустить бота с помощью кнопки 'Перезапустить бота'", true);
+                    break;
+                case VIEW_APPOINTMENT:
+                    editAppointment(Long.parseLong(callbackName), chatId);
                     break;
 
+                case DELETED_APPOINTMENT:
+                    Long atId = Long.parseLong(callbackName);
+                    appointmentDeleteSuccessfull(chatId, atId);
+                    appointmentService.delete(appointmentTimeslotService.getAllById(atId).getAppointment().getId());
+                    break;
                 case CANCEL_ACTION:
                     sendMessage(chatId, CANCEL_ACTION_TEXT, true);
             }
@@ -245,7 +269,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setChatId(String.valueOf(chatId));
         message.setMessageId((int) messageId);
         message.setText(text + "\n" + "Услуга: " + customerService.getName() + "\n" +
-                "Цена: " + customerService.getPrice() + "\n" +
+                "Цена: " + customerService.getPrice() + "тг" + "\n" +
                 "Длительность: " + customerService.getDuration() + "\n" +
                 "Вы хотите заказать эту услугу?");
         message.setReplyMarkup(getTimeslotsAfterServices(customerService));
@@ -441,9 +465,13 @@ public class TelegramBot extends TelegramLongPollingBot {
         rows.add(row);
 
         row = new KeyboardRow();
-        row.add("Гайды");
+        row.add("Мои активные записи");
+        row.add("Связаться с барбером");
         rows.add(row);
 
+        row = new KeyboardRow();
+        row.add("Управление бронированием");
+        rows.add(row);
         keyboard.setKeyboard(rows);
 
         return keyboard;
@@ -540,13 +568,13 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void showAllActiveAppointments(long chatId, long messageId,
-                                           List<Appointment> clientAppointments)
-    {
+                                           List<Appointment> clientAppointments) {
         EditMessageText messageText = new EditMessageText();
         messageText.setChatId(String.valueOf(chatId));
         messageText.setMessageId((int) messageId);
 
         List<Timeslot> activeTimeslots = timeslotService.getAllActiveTimeslotByChatId(chatId);
+
         for (int i = 0; i < clientAppointments.size(); i++) {
             Appointment appointment = clientAppointments.get(i);
 
@@ -557,13 +585,13 @@ public class TelegramBot extends TelegramLongPollingBot {
 
                 LocalTime endTime = timeslot.getStartTime().plusMinutes(appointment.getService().getDuration());
                 String timeForBooking;
-                if (appointment.getService().getDuration() > 60){
+                if (appointment.getService().getDuration() > 60) {
                     timeForBooking = timeslot.getStartTime() + " - " + endTime.plusMinutes(60);
                 } else {
                     timeForBooking = timeslot.getStartTime() + " - " + endTime;
                 }
 
-                String messageToClient =  "Запись №: " + random + " создана.\n"
+                String messageToClient = "Запись №: " + random + " создана.\n"
                         + "Клиент: " + appointment.getClient().getName() + ".\n"
                         + "Услуга: " + appointment.getService().getName() + ".\n"
                         + "Дата: " + appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + ".\n"
@@ -573,36 +601,99 @@ public class TelegramBot extends TelegramLongPollingBot {
             }
         }
 
-        try{
-            execute(messageText);
-        } catch (TelegramApiException e){
-            sendMessage(chatId, "Произошла ошибка пожалуйста попробуйте заново", true );
-        }
-
-    }
-
-    private void appointmentCreated(long chatId, long messageId,
-                                    Appointment appointment,
-                                    AppointmentTimeslot appointmentTimeslot) {
-        EditMessageText messageText = new EditMessageText();
-        messageText.setChatId(String.valueOf(chatId));
-        messageText.setMessageId((int) messageId);
-        String[] randomUUID = UUID.randomUUID().toString().split("-");
-        String random = randomUUID[0];
-        String timeForBooking = appointmentTimeslot.getTimeslot().getStartTime() + " - " + appointmentTimeslot.getTimeslot().getEndTime();
-        messageText.setText("Запись №: " + random + " создана.\n"
-                + "Клиент: " + appointment.getClient().getName() + ".\n"
-                + "Услуга: " + appointment.getService().getName() + ".\n"
-                + "Дата: " + appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + ".\n"
-                + "Время: " + timeForBooking + ".\n"
-                + "До скорой встречи " + appointment.getClient().getName() + "!");
 
         try {
             execute(messageText);
         } catch (TelegramApiException e) {
-            System.out.println(e.getMessage());
+            sendMessage(chatId, "Произошла ошибка пожалуйста попробуйте заново", true);
         }
 
+    }
+
+    private void sendAllActiveAppointments(long chatId, List<Appointment> appointments) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        List<Timeslot> timeslotsByChatId = timeslotService.getAllActiveTimeslotByChatId(chatId);
+        if (appointments.size() == timeslotsByChatId.size()) {
+            for (int i = 0; i < appointments.size(); i++) {
+                Appointment appointment = appointments.get(i);
+
+                for (int j = 0; j < timeslotsByChatId.size(); j++) {
+                    Timeslot timeslot = timeslotsByChatId.get(j);
+                    String[] randomUUID = UUID.randomUUID().toString().split("-");
+                    String random = randomUUID[0];
+
+                    LocalTime endTime = timeslot.getStartTime().plusMinutes(appointment.getService().getDuration());
+                    String timeForBooking;
+                    if (appointment.getService().getDuration() > 60) {
+                        timeForBooking = timeslot.getStartTime() + " - " + endTime.plusMinutes(60);
+                    } else {
+                        timeForBooking = timeslot.getStartTime() + " - " + endTime;
+                    }
+
+                    String messageToClient = "Запись №: " + random + " создана.\n"
+                            + "Клиент: " + appointment.getClient().getName() + ".\n"
+                            + "Услуга: " + appointment.getService().getName() + ".\n"
+                            + "Дата: " + appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + ".\n"
+                            + "Время: " + timeForBooking + ".\n"
+                            + "До скорой встречи " + appointment.getClient().getName() + "!";
+                    message.setText(messageToClient);
+                }
+            }
+        } else {
+            for (int i = 0; i < appointments.size(); i++) {
+                Appointment appointment = appointments.get(i);
+                String[] randomUUID = UUID.randomUUID().toString().split("-");
+                String random = randomUUID[0];
+
+                String messageToClient = "Запись №: " + random + " создана.\n"
+                        + "Клиент: " + appointment.getClient().getName() + ".\n"
+                        + "Услуга: " + appointment.getService().getName() + ".\n"
+                        + "Дата: " + appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + ".\n"
+                        + "Время: Уточните пожалуйста по телефону" + ".\n"
+                        + "До скорой встречи " + appointment.getClient().getName() + "!";
+                message.setText(messageToClient);
+            }
+        }
+
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void appointmentManagement(long chatId) {
+        SendMessage message = new SendMessage();
+        message.setChatId(String.valueOf(chatId));
+        message.setText("Ваши активные записи на данный момент");
+        message.setReplyMarkup(appointmentManagementKeyboard(chatId));
+
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    private InlineKeyboardMarkup appointmentManagementKeyboard(long chatId) {
+        List<AppointmentTimeslot> activeAppointments = appointmentTimeslotService.getAllActiveBookings(chatId);
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
+        List<InlineKeyboardButton> buttons = new ArrayList<>();
+        InlineKeyboardButton button = new InlineKeyboardButton();
+        for (int i = 0; i < activeAppointments.size(); i++) {
+            String text = activeAppointments.get(i).getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                    + "\n" + activeAppointments.get(i).getTimeslot().getStartTime() + "-" + activeAppointments.get(i).getTimeslot().getEndTime();
+            button.setText(text);
+            button.setCallbackData(CallbackType.VIEW_APPOINTMENT + "%" + activeAppointments.get(i).getId());
+            buttons.add(button);
+        }
+        rowsInLine.add(buttons);
+        markup.setKeyboard(rowsInLine);
+        return markup;
     }
 
     private void showPortfolio(long chatId) throws IOException {
@@ -632,5 +723,57 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         return List.of(yesBtn, noBtn);
     }
+
+    private void editAppointment(Long id, long chatId) {
+        AppointmentTimeslot appointmentTimeslot = appointmentTimeslotService.getAllById(id);
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(String.valueOf(chatId));
+        String text = "Клиент: " + appointmentTimeslot.getAppointment().getClient().getName() + ".\n"
+                + "Услуга: " + appointmentTimeslot.getAppointment().getService().getName() + ".\n"
+                + "Дата: " + appointmentTimeslot.getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + ".\n"
+                + "Время: " + appointmentTimeslot.getTimeslot().getStartTime() + "-" + appointmentTimeslot.getTimeslot().getEndTime() + ".\n"
+                + "До скорой встречи " + appointmentTimeslot.getAppointment().getClient().getName() + "!";
+        sendMessage.setText(text);
+        sendMessage.setReplyMarkup(deleteAppointment(appointmentTimeslot.getId()));
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            sendMessage(chatId, e.getMessage(), true);
+        }
+
+    }
+
+    private InlineKeyboardMarkup deleteAppointment(Long id) {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        InlineKeyboardButton deleteBtn = new InlineKeyboardButton();
+        deleteBtn.setText("Удалить");
+        deleteBtn.setCallbackData(CallbackType.DELETED_APPOINTMENT + "%" + id);
+
+        rows.add(List.of(
+                deleteBtn
+        ));
+
+        markup.setKeyboard(rows);
+        return markup;
+    }
+
+    private void appointmentDeleteSuccessfull(long chatId, Long id){
+        SendMessage message = new SendMessage();
+        AppointmentTimeslot appointmentTimeslotToDelete = appointmentTimeslotService.getAllById(id);
+        String text = "Ваша запись успешно удалена!\n" +
+                "Клиент: " + appointmentTimeslotToDelete.getAppointment().getClient().getName() + ".\n"
+                + "Услуга: " + appointmentTimeslotToDelete.getAppointment().getService().getName() + ".\n"
+                + "Дата: " + appointmentTimeslotToDelete.getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")) + ".\n"
+                + "Время: " + appointmentTimeslotToDelete.getTimeslot().getStartTime() + "-" + appointmentTimeslotToDelete.getTimeslot().getEndTime() + ".\n";
+        message.setChatId(String.valueOf(chatId));
+        message.setText(text);
+        try{
+            execute(message);
+        } catch (TelegramApiException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
 
 }
