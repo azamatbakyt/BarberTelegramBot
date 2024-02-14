@@ -1,7 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.config;
 
 
-import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramBot;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramBotV2;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Component
 public class BotInitializer {
-    private final TelegramBot telegramBot;
+    private final TelegramBotV2 telegramBot;
     private final Logger log = LogManager.getLogger(BotInitializer.class);
     @Autowired
-    public BotInitializer(TelegramBot telegramBot) {
+    public BotInitializer(TelegramBotV2 telegramBot) {
         this.telegramBot = telegramBot;
     }
 

@@ -5,7 +5,7 @@ import com.vdurmont.emoji.EmojiParser;
 import jakarta.annotation.PostConstruct;
 import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
 import kz.azamatbakyt.BarberTelegramBot.entity.*;
-import kz.azamatbakyt.BarberTelegramBot.helpers.CallbackType;
+import kz.azamatbakyt.BarberTelegramBot.helpers.CallbackTypes;
 import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
-@Component
+//@Component
 public class TelegramBot extends TelegramLongPollingBot {
 
 
@@ -169,12 +169,12 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             String callback = update.getCallbackQuery().getData();
             String[] callbackData = callback.split("%");
-            CallbackType callbackType = CallbackType.valueOf(callbackData[0]);
+            CallbackTypes callbackTypes = CallbackTypes.valueOf(callbackData[0]);
             String callbackName = callbackData[1];
             long messageId = update.getCallbackQuery().getMessage().getMessageId();
             long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-            switch (callbackType) {
+            switch (callbackTypes) {
                 case SERVICE_GROUP:
                     CustomerServiceGroup group = customerServiceGroupService.getServiceGroupByName(callbackName);
                     choiceServiceGroup(chatId, messageId, group);
@@ -306,7 +306,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         for (CustomerService service : services) {
             InlineKeyboardButton haircutMen = new InlineKeyboardButton();
             haircutMen.setText(service.getName());
-            haircutMen.setCallbackData(CallbackType.SERVICE + "%" + service.getName());
+            haircutMen.setCallbackData(CallbackTypes.SERVICE + "%" + service.getName());
 
             currentRow.add(haircutMen);
 
@@ -349,7 +349,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         for (Timeslot timeslot : timeslots) {
             InlineKeyboardButton timeslotBtn = new InlineKeyboardButton();
             timeslotBtn.setText(timeslot.getStartTime() + " - " + timeslot.getEndTime());
-            timeslotBtn.setCallbackData(CallbackType.MAKE_APPOINTMENT + "%" + timeslot.getStartTime());
+            timeslotBtn.setCallbackData(CallbackTypes.MAKE_APPOINTMENT + "%" + timeslot.getStartTime());
 
             currentRow.add(timeslotBtn);
             if (currentRow.size() == 2) {
@@ -393,7 +393,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             InlineKeyboardButton button = new InlineKeyboardButton();
             String formattedDay = day.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
             button.setText(formattedDay);
-            button.setCallbackData(CallbackType.CHOOSE_TIMESLOT + "%" + day);
+            button.setCallbackData(CallbackTypes.CHOOSE_TIMESLOT + "%" + day);
             currentRow.add(button);
 
             if (currentRow.size() == 2) {
@@ -486,7 +486,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             InlineKeyboardButton buttonHaircutService = new InlineKeyboardButton();
             buttonHaircutService.setText(serviceGroup.getName());
-            buttonHaircutService.setCallbackData(CallbackType.SERVICE_GROUP + "%" + serviceGroup.getName());
+            buttonHaircutService.setCallbackData(CallbackTypes.SERVICE_GROUP + "%" + serviceGroup.getName());
             currentRow.add(buttonHaircutService);
 
             if (currentRow.size() == 2) {
@@ -511,8 +511,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         rowsInline.add(
                 createAnswerKeyboard(
-                        CallbackType.YES_FOR_CREATING_APPOINTMENT + "%" + customerService.getName(),
-                        CallbackType.CANCEL_ACTION + "%" + customerService.getName()
+                        CallbackTypes.YES_FOR_CREATING_APPOINTMENT + "%" + customerService.getName(),
+                        CallbackTypes.CANCEL_ACTION + "%" + customerService.getName()
                 )
 
         );
@@ -559,8 +559,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
 
         rowsInline.add(createAnswerKeyboard(
-                CallbackType.APPOINTMENT_CREATED + "%" + timeslot.getStartTime(),
-                CallbackType.CANCEL_ACTION + "%" + timeslot.getEndTime()
+                CallbackTypes.APPOINTMENT_CREATED + "%" + timeslot.getStartTime(),
+                CallbackTypes.CANCEL_ACTION + "%" + timeslot.getEndTime()
         ));
 
         markup.setKeyboard(rowsInline);
@@ -688,7 +688,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             String text = activeAppointments.get(i).getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                     + "\n" + activeAppointments.get(i).getTimeslot().getStartTime() + "-" + activeAppointments.get(i).getTimeslot().getEndTime();
             button.setText(text);
-            button.setCallbackData(CallbackType.VIEW_APPOINTMENT + "%" + activeAppointments.get(i).getId());
+            button.setCallbackData(CallbackTypes.VIEW_APPOINTMENT + "%" + activeAppointments.get(i).getId());
             buttons.add(button);
         }
         rowsInLine.add(buttons);
@@ -748,7 +748,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         InlineKeyboardButton deleteBtn = new InlineKeyboardButton();
         deleteBtn.setText("Удалить");
-        deleteBtn.setCallbackData(CallbackType.DELETED_APPOINTMENT + "%" + id);
+        deleteBtn.setCallbackData(CallbackTypes.DELETED_APPOINTMENT + "%" + id);
 
         rows.add(List.of(
                 deleteBtn
