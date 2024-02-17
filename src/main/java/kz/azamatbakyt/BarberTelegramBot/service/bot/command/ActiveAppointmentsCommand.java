@@ -38,11 +38,11 @@ public class ActiveAppointmentsCommand implements Command {
                 appointments.stream().map(Appointment::getId).collect(Collectors.toList())
         );
         StringBuilder msg = new StringBuilder();
+        msg.append("Ваши активные записи: ").append("\n\n");
         for (int i = 0; i < appointments.size(); i++) {
             Appointment appointment = appointments.get(i);
 
-            msg.append("Ваши активные записи: ").append("\n\n")
-                    .append("Имя клиента: ").append(appointment.getClient().getName()).append("\n")
+            msg.append("Имя клиента: ").append(appointment.getClient().getName()).append("\n")
                     .append("Услуга: ").append(appointment.getService().getName()).append("\n")
                     .append("Цена: ").append(appointment.getService().getPrice()).append(" тг\n")
                     .append("Длительность: ").append(appointment.getService().getDuration()).append(" мин\n")
@@ -57,10 +57,10 @@ public class ActiveAppointmentsCommand implements Command {
                                     appointmentTimeslot.getTimeslot().getEndTime()
                             ))
                     );
-            msg.append("До скорой встречи!");
-            msg.append("\n");
-        }
 
+            msg.append("\n\n");
+        }
+        msg.append("До скорой встречи!");
         message.setText(msg.toString());
         return build(message);
     }
