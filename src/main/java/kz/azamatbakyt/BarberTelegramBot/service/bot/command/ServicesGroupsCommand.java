@@ -1,12 +1,11 @@
 package kz.azamatbakyt.BarberTelegramBot.service.bot.command;
 
-import com.vdurmont.emoji.EmojiParser;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
 import kz.azamatbakyt.BarberTelegramBot.service.CustomerServiceGroupService;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.JsonHandler;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramUtils;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.callback.CallbackType;
-import org.springframework.beans.factory.annotation.Autowired;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -27,14 +26,14 @@ public class ServicesGroupsCommand implements Command {
     }
 
     @Override
-    public SendMessage apply(Update update) {
+    public List<Message> apply(Update update) {
         String chatId = TelegramUtils.getStringChatId(update);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(ALL_SERVICES);
         sendMessage.setReplyMarkup(serviceGroups());
 
-        return sendMessage;
+        return build(sendMessage);
     }
 
     private InlineKeyboardMarkup serviceGroups() {

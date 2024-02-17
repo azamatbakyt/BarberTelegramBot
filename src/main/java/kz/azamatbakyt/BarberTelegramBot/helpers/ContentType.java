@@ -1,6 +1,6 @@
 package kz.azamatbakyt.BarberTelegramBot.helpers;
 
-public enum CallbackTypes {
+public enum ContentType {
     SERVICE,
     SERVICE_GROUP,
     TIMESLOT,

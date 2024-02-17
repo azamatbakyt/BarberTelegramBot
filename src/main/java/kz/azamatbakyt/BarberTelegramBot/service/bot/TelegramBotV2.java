@@ -1,5 +1,6 @@
 package kz.azamatbakyt.BarberTelegramBot.service.bot;
 
+import jakarta.annotation.PostConstruct;
 import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
 import kz.azamatbakyt.BarberTelegramBot.entity.Client;
 import kz.azamatbakyt.BarberTelegramBot.service.ClientService;
@@ -10,10 +11,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class TelegramBotV2 extends TelegramLongPollingBot {
@@ -60,7 +69,6 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
      *
      * @param update
      */
-
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -69,20 +77,39 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
             SendMessage registrationMessage = clientRegistrationHandler.registerClientIfNeeded(update);
 
             if (registrationMessage == null) {
-                sendMessage(commandsHandler.handleCommands(update));
+                send(commandsHandler.handleCommand(update));
             } else {
                 sendMessage(registrationMessage);
             }
         } else if (update.hasCallbackQuery()) {
-            editMessageText(callbacksHandler.handleCallbacks(update));
+            send(callbacksHandler.handleCallbacks(update));
         }
     }
+
+    private void send(List<Message> messages) {
+        for (Message msg : messages) {
+            switch (msg.getMessageType()) {
+                case PHOTO: sendPhoto(msg.getSendPhoto());
+                case MESSAGE: sendMessage(msg.getSendMessage());
+                case EDIT_MESSAGE_TEXT: editMessageText(msg.getEditMessageText());
+            }
+        }
+    }
+
 
     private void sendMessage(SendMessage sendMessage) {
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
-            LOGGER.error(e.getMessage());
+            LOGGER.error("", e);
+        }
+    }
+
+    private void sendPhoto(SendPhoto sendPhoto) {
+        try {
+            execute(sendPhoto);
+        } catch (TelegramApiException e) {
+            LOGGER.error("", e);
         }
     }
 
@@ -90,7 +117,21 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
         try{
             execute(editMessageText);
         } catch (TelegramApiException e){
-            LOGGER.error(e.getMessage());
+            LOGGER.error("", e);
+        }
+    }
+
+
+    @PostConstruct
+    private void menu(){
+        List<BotCommand> menu = new ArrayList<>();
+        menu.add(new BotCommand("/start", "Перезапустить бота"));
+        menu.add(new BotCommand("/help", "Помощь"));
+
+        try{
+            execute(new SetMyCommands(menu, new BotCommandScopeDefault(), null));
+        } catch(TelegramApiException e){
+            System.out.println(e.getMessage());
         }
     }
 }

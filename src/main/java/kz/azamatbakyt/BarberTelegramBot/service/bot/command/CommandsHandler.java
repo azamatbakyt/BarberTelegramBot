@@ -1,10 +1,13 @@
 package kz.azamatbakyt.BarberTelegramBot.service.bot.command;
 
+import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -14,26 +17,33 @@ public class CommandsHandler {
     private final Map<CommandType, Command> commands;
 
     public CommandsHandler(StartCommand startCommand,
-                           ServicesGroupsCommand servicesGroupsCommand) {
+                           ServicesGroupsCommand servicesGroupsCommand,
+                           HelpCommand helpCommand,
+                           PortfolioCommand portfolioCommand,
+                           ActiveAppointmentsCommand activeAppointmentsCommand,
+                           AppointmentManagementCommand appointmentManagementCommand) {
         this.commands = Map.of(
                 CommandType.START, startCommand,
-                CommandType.SERVICE_GROUP, servicesGroupsCommand
-
+                CommandType.SERVICE_GROUP, servicesGroupsCommand,
+                CommandType.HELP,  helpCommand,
+                CommandType.PORTFOLIO, portfolioCommand,
+                CommandType.ACTIVE_APPOINTMENTS, activeAppointmentsCommand,
+                CommandType.MANAGE_APPOINTMENTS, appointmentManagementCommand
         );
     }
 
-
-    public SendMessage handleCommands(Update update) {
+    public List<Message> handleCommand(Update update) {
         String messageText = update.getMessage().getText();
-        String command = messageText.split(" ")[0];
-        CommandType commandType = CommandType.fromText(command);
+        CommandType commandType = CommandType.fromText(messageText);
         long chatId = update.getMessage().getChatId();
 
         var commandHandler = commands.get(commandType);
         if (commandHandler != null) {
             return commandHandler.apply(update);
         } else {
-            return new SendMessage(String.valueOf(chatId), "Consts.UNKNOWN_COMMAND");
+            return Collections.singletonList(
+                    new Message(new SendMessage(String.valueOf(chatId), "Неизвестная команда"))
+            );
         }
     }
 

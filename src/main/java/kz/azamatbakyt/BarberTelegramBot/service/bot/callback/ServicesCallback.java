@@ -6,11 +6,10 @@ import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
 import kz.azamatbakyt.BarberTelegramBot.service.CSService;
 import kz.azamatbakyt.BarberTelegramBot.service.CustomerServiceGroupService;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.JsonHandler;
-import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramBot;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramUtils;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -32,15 +31,17 @@ public class ServicesCallback implements CallbackHandler{
     }
 
     @Override
-    public EditMessageText apply(Callback callback, Update update) {
-        String chatId = TelegramUtils.getStringChatId(update);
-        int messageId = TelegramUtils.getStringMessageId(update);
+    public List<Message> apply(Callback callback, Update update) {
+        String text = "Вы выбрали " + callback.getData() + " . \nДавайте выберем какую именно услугу вы хотите?";
+        String chatId = TelegramUtils.getMessageChatId(update);
+        int messageId = TelegramUtils.getMessageId(update);
         CustomerServiceGroup group = customerServiceGroupService.getServiceGroupByName(callback.getData());
         EditMessageText answer = new EditMessageText();
         answer.setChatId(chatId);
         answer.setMessageId(messageId);
+        answer.setText(text);
         answer.setReplyMarkup(services(group));
-        return answer;
+        return build(answer);
     }
 
     private InlineKeyboardMarkup services(CustomerServiceGroup group) {

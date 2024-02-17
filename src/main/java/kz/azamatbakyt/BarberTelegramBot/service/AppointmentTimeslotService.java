@@ -58,5 +58,8 @@ public class AppointmentTimeslotService {
         return appointmentTimeslotRepository.findAllById(id);
     }
 
+    public List<AppointmentTimeslot> getAllByIdIn(List<Long> ids){
+        return appointmentTimeslotRepository.findAllByAppointmentIdIn(ids);
+    }
 
 }
