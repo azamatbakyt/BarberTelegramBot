@@ -1,13 +1,16 @@
 package kz.azamatbakyt.BarberTelegramBot;
 
+import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerService;
 import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.service.AppointmentService;
 import kz.azamatbakyt.BarberTelegramBot.service.CSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -5,5 +5,6 @@ public enum Status {
     DATE_SELECTED,
     TIMESLOT_SELECTED,
     BOOKING_SUCCESSFUL,
-    BOOKING_CANCELED
+
+
 }

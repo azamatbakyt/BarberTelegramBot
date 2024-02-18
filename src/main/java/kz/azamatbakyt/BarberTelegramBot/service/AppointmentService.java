@@ -160,4 +160,12 @@ public class AppointmentService {
     public List<Appointment> getActiveAppointments(Long chatId){
         return appointmentRepository.findAllByCreatedAppointment(chatId);
     }
+
+    public void deleteAppointment(Appointment appointment){
+        appointmentRepository.delete(appointment);
+    }
+
+    public Appointment getCanceledApppointment(Status status){
+        return appointmentRepository.findCanceledAppointmnet(status.toString());
+    }
 }

@@ -24,6 +24,7 @@ import java.util.List;
 
 @Component
 public class GetDaysCallback implements CallbackHandler{
+    private final static String cancelFirstAppointment = "Вы уже начали одну сессию бронирования прошу вас завершите его!\nИ вы сможете забронировать другую!";
 
     private final static String text = "Вы выбрали услугу %s" +
             ". \nА давайте теперь выберем свободное для вас время.";
@@ -46,7 +47,19 @@ public class GetDaysCallback implements CallbackHandler{
     public List<Message> apply(Callback callback, Update update) {
         CustomerService service = csService.getServiceByName(callback.getData());
         String chatId = TelegramUtils.getMessageChatId(update);
+        Appointment conditiion1 = appointmentService.getNotCreatedAppointmentByChatId(Long.valueOf(chatId), Status.SERVICE_SELECTED);
+        Appointment condiition2 = appointmentService.getNotCreatedAppointmentByChatId(Long.valueOf(chatId), Status.DATE_SELECTED);
+        Appointment condiiton3 = appointmentService.getNotCreatedAppointmentByChatId(Long.valueOf(chatId), Status.TIMESLOT_SELECTED);
         int messageId = TelegramUtils.getMessageId(update);
+
+        if (conditiion1 != null || condiition2 != null || condiiton3 != null) {
+
+            EditMessageText messageText = new EditMessageText();
+            messageText.setChatId(chatId);
+            messageText.setMessageId(messageId);
+            messageText.setText(cancelFirstAppointment);
+            return build(messageText);
+        }
         EditMessageText messageText = new EditMessageText();
         messageText.setChatId(chatId);
         messageText.setMessageId(messageId);
@@ -64,9 +77,9 @@ public class GetDaysCallback implements CallbackHandler{
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<LocalDate> days = scheduleService.getDays();
-        // TODO вывести дни
-        List<InlineKeyboardButton> currentRow = new ArrayList<>();
 
+        // Создаем кнопки для каждого дня
+        List<InlineKeyboardButton> currentRow = new ArrayList<>();
         for (LocalDate day : days) {
             InlineKeyboardButton button = new InlineKeyboardButton();
             String formattedDay = day.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
@@ -75,18 +88,32 @@ public class GetDaysCallback implements CallbackHandler{
             button.setCallbackData(callback);
             currentRow.add(button);
 
+            // Создаем новую строку, когда уже есть две кнопки
             if (currentRow.size() == 2) {
                 rowsInline.add(currentRow);
                 currentRow = new ArrayList<>();
             }
+
         }
 
         if (!currentRow.isEmpty()) {
             rowsInline.add(currentRow);
         }
 
+
+        InlineKeyboardButton cancelBtn = new InlineKeyboardButton();
+        cancelBtn.setText("Отменить запись");
+        String cancelCallback = JsonHandler.toJson(List.of(CallbackType.DATE_CANCELED, days.get(0).toString()));
+        cancelBtn.setCallbackData(cancelCallback);
+
+        List<InlineKeyboardButton> cancelBtnRow = new ArrayList<>();
+        cancelBtnRow.add(cancelBtn);
+        rowsInline.add(cancelBtnRow);
+
         markup.setKeyboard(rowsInline);
 
         return markup;
     }
+
+
 }

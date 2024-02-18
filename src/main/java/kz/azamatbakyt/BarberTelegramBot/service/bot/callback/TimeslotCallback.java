@@ -89,6 +89,15 @@ public class TimeslotCallback implements CallbackHandler{
         if (!currentRow.isEmpty()) {
             rowsInLine.add(currentRow);
         }
+        InlineKeyboardButton cancelBtn = new InlineKeyboardButton();
+        cancelBtn.setText("Отменить запись");
+        String cancelCallback = JsonHandler.toJson(List.of(CallbackType.TIMESLOT_CANCELED, timeslots.get(0).getStartTime().toString()));
+        cancelBtn.setCallbackData(cancelCallback);
+
+
+        List<InlineKeyboardButton> cancelBtnRow = new ArrayList<>();
+        cancelBtnRow.add(cancelBtn);
+        rowsInLine.add(cancelBtnRow);
 
         markup.setKeyboard(rowsInLine);
         return markup;

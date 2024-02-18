@@ -3,7 +3,9 @@ package kz.azamatbakyt.BarberTelegramBot.service.bot.command;
 import kz.azamatbakyt.BarberTelegramBot.entity.AppointmentTimeslot;
 import kz.azamatbakyt.BarberTelegramBot.helpers.ContentType;
 import kz.azamatbakyt.BarberTelegramBot.service.AppointmentTimeslotService;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.JsonHandler;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramUtils;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.callback.CallbackType;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -45,7 +47,8 @@ public class AppointmentManagementCommand implements Command {
             String text = activeAppointments.get(i).getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
                     + "\n" + activeAppointments.get(i).getTimeslot().getStartTime() + "-" + activeAppointments.get(i).getTimeslot().getEndTime();
             button.setText(text);
-            button.setCallbackData(ContentType.VIEW_APPOINTMENT + "%" + activeAppointments.get(i).getId());
+            String callback = JsonHandler.toJson(List.of(CallbackType.VIEW_APPOINTMENT, activeAppointments.get(i).getId()));
+            button.setCallbackData(callback);
             buttons.add(button);
         }
         rowsInLine.add(buttons);

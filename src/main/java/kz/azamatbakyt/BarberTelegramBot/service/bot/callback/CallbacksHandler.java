@@ -4,11 +4,9 @@ import kz.azamatbakyt.BarberTelegramBot.service.bot.JsonHandler;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +20,15 @@ public class CallbacksHandler {
     public CallbacksHandler(ServicesCallback servicesCallback,
                             ServiceAgreeCallback serviceAgreeCallback,
                             GetDaysCallback daysCallback,
-                            CancelActionCallback  cancelCallback,
+                            CancelActionCallback cancelCallback,
                             TimeslotCallback timeslotCallback,
                             ConfirmAppointmentCallback confirmAppointmentCallback,
-                            AppointmentCreated appointmentCreated) {
+                            AppointmentCreated appointmentCreated,
+                            DateCanceledCallback dateCanceledCallback,
+                            TimeslotCanceledCallback timeslotCanceledCallback,
+                            AppointmentNotCreatedCallback appointmentNotCreatedCallback,
+                            ViewAppointmentCallback viewAppointmentCallback,
+                            DeleteAppointmentCallback deleteAppointmentCallback) {
         this.callbacks = Map.of(
                 CallbackType.SERVICES, servicesCallback,
                 CallbackType.SERVICE_AGREE, serviceAgreeCallback,
@@ -33,7 +36,12 @@ public class CallbacksHandler {
                 CallbackType.NO_CANCEL_ACTION, cancelCallback,
                 CallbackType.DATE, timeslotCallback,
                 CallbackType.TIMESLOTS, confirmAppointmentCallback,
-                CallbackType.APPOINTMENT_CREATED, appointmentCreated
+                CallbackType.APPOINTMENT_CREATED, appointmentCreated,
+                CallbackType.DATE_CANCELED, dateCanceledCallback,
+                CallbackType.TIMESLOT_CANCELED, timeslotCanceledCallback,
+                CallbackType.APPOINTMENT_NOT_CREATED, appointmentNotCreatedCallback
+//                CallbackType.VIEW_APPOINTMENT, viewAppointmentCallback,
+//                CallbackType.DELETED_APPOINTMENT, deleteAppointmentCallback
         );
 
     }

@@ -38,4 +38,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
                     "where client.chat_id=? and appointment.status=?")
     Appointment findAllByStatusAndAndClientChatId(Long chatId, String status);
 
+    @Query(nativeQuery = true, value = "select appointment.* from appointment " +
+            "where appointment.status=?;")
+    Appointment findCanceledAppointmnet(String status);
+
 }

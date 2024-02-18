@@ -2,7 +2,6 @@ package kz.azamatbakyt.BarberTelegramBot.service.bot.callback;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
-import kz.azamatbakyt.BarberTelegramBot.helpers.ContentType;
 import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.service.AppointmentService;
 import kz.azamatbakyt.BarberTelegramBot.service.AppointmentTimeslotService;
@@ -86,7 +85,7 @@ public class ConfirmAppointmentCallback implements CallbackHandler{
                 List.of(CallbackType.APPOINTMENT_CREATED, timeslot.getStartTime().toString())
         );
         String callback2 = JsonHandler.toJson(
-                List.of(CallbackType.NO_CANCEL_ACTION, timeslot.getEndTime().toString())
+                List.of(CallbackType.APPOINTMENT_NOT_CREATED, timeslot.getEndTime().toString())
         );
 
         rowsInline.add(TelegramUtils.createAnswerKeyboard(
