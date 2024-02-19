@@ -11,39 +11,44 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Map.entry;
+
 @Component
 public class CallbacksHandler {
 
     private final Map<CallbackType, CallbackHandler> callbacks;
 
     @Autowired
-    public CallbacksHandler(ServicesCallback servicesCallback,
-                            ServiceAgreeCallback serviceAgreeCallback,
-                            GetDaysCallback daysCallback,
-                            CancelActionCallback cancelCallback,
-                            TimeslotCallback timeslotCallback,
-                            ConfirmAppointmentCallback confirmAppointmentCallback,
-                            AppointmentCreated appointmentCreated,
-                            DateCanceledCallback dateCanceledCallback,
-                            TimeslotCanceledCallback timeslotCanceledCallback,
-                            AppointmentNotCreatedCallback appointmentNotCreatedCallback,
-                            ViewAppointmentCallback viewAppointmentCallback,
-                            DeleteAppointmentCallback deleteAppointmentCallback) {
-        this.callbacks = Map.of(
-                CallbackType.SERVICES, servicesCallback,
-                CallbackType.SERVICE_AGREE, serviceAgreeCallback,
-                CallbackType.YES_CREATE_SERVICE, daysCallback,
-                CallbackType.NO_CANCEL_ACTION, cancelCallback,
-                CallbackType.DATE, timeslotCallback,
-                CallbackType.TIMESLOTS, confirmAppointmentCallback,
-                CallbackType.APPOINTMENT_CREATED, appointmentCreated,
-                CallbackType.DATE_CANCELED, dateCanceledCallback,
-                CallbackType.TIMESLOT_CANCELED, timeslotCanceledCallback,
-                CallbackType.APPOINTMENT_NOT_CREATED, appointmentNotCreatedCallback
-//                CallbackType.VIEW_APPOINTMENT, viewAppointmentCallback,
-//                CallbackType.DELETED_APPOINTMENT, deleteAppointmentCallback
+    public CallbacksHandler(
+            ServicesCallback servicesCallback,
+            ServiceAgreeCallback serviceAgreeCallback,
+            GetDaysCallback daysCallback,
+            CancelActionCallback cancelCallback,
+            TimeslotCallback timeslotCallback,
+            ConfirmAppointmentCallback confirmAppointmentCallback,
+            AppointmentCreated appointmentCreated,
+            DateCanceledCallback dateCanceledCallback,
+            TimeslotCanceledCallback timeslotCanceledCallback,
+            AppointmentNotCreatedCallback appointmentNotCreatedCallback,
+            ViewAppointmentCallback viewAppointmentCallback,
+            DeleteAppointmentCallback deleteAppointmentCallback,
+            EmptyTimeslotCallback emptyTimeslotCallback
+    ) {
+        this.callbacks = Map.ofEntries(
+                entry(CallbackType.SERVICES, servicesCallback),
+                entry(CallbackType.SERVICE_AGREE, serviceAgreeCallback),
+                entry(CallbackType.YES_CREATE_SERVICE, daysCallback),
+                entry(CallbackType.NO_CANCEL_ACTION, cancelCallback),
+                entry(CallbackType.DATE, timeslotCallback),
+                entry(CallbackType.TIMESLOTS, confirmAppointmentCallback),
+                entry(CallbackType.APPOINTMENT_CREATED, appointmentCreated),
+                entry(CallbackType.DATE_CANCELED, dateCanceledCallback),
+                entry(CallbackType.TIMESLOT_CANCELED, timeslotCanceledCallback),
+                entry(CallbackType.APPOINTMENT_NOT_CREATED, appointmentNotCreatedCallback),
+                entry(CallbackType.VIEW_APPOINTMENT, viewAppointmentCallback),
+                entry(CallbackType.DELETED_APPOINTMENT, deleteAppointmentCallback),
+                entry(CallbackType.EMPTY_TIMESLOTS, emptyTimeslotCallback)
         );
-
     }
 
     public List<Message> handleCallbacks(Update update) {

@@ -10,9 +10,11 @@ import kz.azamatbakyt.BarberTelegramBot.service.AppointmentTimeslotService;
 import kz.azamatbakyt.BarberTelegramBot.service.TimeslotService;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.JsonHandler;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramUtils;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.command.CommandType;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -24,7 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class TimeslotCallback implements CallbackHandler{
+public class TimeslotCallback implements CallbackHandler {
+
+    private final static String empty = "К сожалению на сегодня свободных таймслотов нету!";
 
     private final static String text = "Отлично! Вы выбрали дату %s" +
             ". \nА давайте теперь выберем свободное для вас время.";
@@ -46,6 +50,15 @@ public class TimeslotCallback implements CallbackHandler{
         LocalDate date = LocalDate.parse(callback.getData());
         String chatId = TelegramUtils.getMessageChatId(update);
         int messageId = TelegramUtils.getMessageId(update);
+        Appointment appointment1 = appointmentService.getNotCreatedAppointmentByChatId(Long.valueOf(chatId), Status.SERVICE_SELECTED);
+        List<Timeslot> timeslots = appointmentService.getAvailableTimeslots(date, appointment1.getService());
+        if (timeslots.isEmpty()){
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId);
+            message.setText(empty);
+            message.setReplyMarkup(restart());
+            return sendMessage(message);
+        }
         String formattedDay = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
         Appointment appointment = appointmentService.updateDateOfBookingByChatId(
                 Long.valueOf(chatId),
@@ -67,7 +80,7 @@ public class TimeslotCallback implements CallbackHandler{
         return build(messageText);
     }
 
-
+    // TODO  Перенести стрим в сервис
     private InlineKeyboardMarkup getTimeslots(LocalDate date, CustomerService service) {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
@@ -103,5 +116,21 @@ public class TimeslotCallback implements CallbackHandler{
         return markup;
     }
 
-
+    private InlineKeyboardMarkup restart(){
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
+        InlineKeyboardButton restart = new InlineKeyboardButton();
+        String callback = JsonHandler.toJson(
+                List.of(
+                        CallbackType.EMPTY_TIMESLOTS, "/start"
+                )
+        );
+        restart.setText("Начать заново");
+        restart.setCallbackData(callback);
+        rows.add(
+                List.of(restart)
+        );
+        markup.setKeyboard(rows);
+        return markup;
+    }
 }

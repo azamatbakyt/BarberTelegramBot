@@ -41,19 +41,23 @@ public class AppointmentManagementCommand implements Command {
         List<AppointmentTimeslot> activeAppointments = appointmentTimeslotService.getAllActiveBookings(chatId);
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
-        List<InlineKeyboardButton> buttons = new ArrayList<>();
-        InlineKeyboardButton button = new InlineKeyboardButton();
+
         for (int i = 0; i < activeAppointments.size(); i++) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
             String text = activeAppointments.get(i).getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                    + "\n" + activeAppointments.get(i).getTimeslot().getStartTime() + "-" + activeAppointments.get(i).getTimeslot().getEndTime();
+                    + activeAppointments.get(i).getTimeslot().getStartTime() + "-" + activeAppointments.get(i).getTimeslot().getEndTime();
             button.setText(text);
             String callback = JsonHandler.toJson(List.of(CallbackType.VIEW_APPOINTMENT, activeAppointments.get(i).getId()));
             button.setCallbackData(callback);
+
+            List<InlineKeyboardButton> buttons = new ArrayList<>();
             buttons.add(button);
+            rowsInLine.add(buttons);
         }
-        rowsInLine.add(buttons);
+
         markup.setKeyboard(rowsInLine);
         return markup;
     }
+
 
 }

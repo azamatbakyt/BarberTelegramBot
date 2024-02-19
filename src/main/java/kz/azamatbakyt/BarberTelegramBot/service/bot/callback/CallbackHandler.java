@@ -1,6 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.service.bot.callback;
 
 import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -14,4 +15,8 @@ public interface CallbackHandler {
     }
 
     List<Message> apply(Callback callback, Update update);
+
+    default List<Message> sendMessage(SendMessage sendMessage){
+        return Collections.singletonList(new Message(sendMessage));
+    }
 }

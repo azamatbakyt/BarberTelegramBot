@@ -84,7 +84,14 @@ public class AppointmentService {
             return result;
         }
 
-        return availableTimeslots;
+        return availableTimeslots.stream()
+                .filter(timeslot -> {
+                            if (LocalDate.now().equals(date)) {
+                                return LocalTime.now().isBefore(timeslot.getStartTime());
+                            }
+                            return true;
+                        }
+                ).collect(Collectors.toList());
     }
 
     public List<Timeslot> getBookedTimeslotsOnDate(LocalDate date) {

@@ -52,7 +52,7 @@ public class ActiveAppointmentsCommand implements Command {
             appointmentTimeslots.stream()
                     .filter(appointmentTimeslot -> appointmentTimeslot.getAppointment().getId().equals(appointment.getId()))
                     .forEach(appointmentTimeslot ->
-                            msg.append(String.format(" %s - %s\n",
+                            msg.append(String.format("\n%s - %s",
                                     appointmentTimeslot.getTimeslot().getStartTime(),
                                     appointmentTimeslot.getTimeslot().getEndTime()
                             ))

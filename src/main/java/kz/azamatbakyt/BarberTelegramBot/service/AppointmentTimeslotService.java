@@ -21,7 +21,7 @@ public class AppointmentTimeslotService {
         this.timeslotService = timeslotService;
     }
 
-    public List<AppointmentTimeslot> getAll(){
+    public List<AppointmentTimeslot> getAll() {
         return appointmentTimeslotRepository.findAll();
     }
 
@@ -34,31 +34,49 @@ public class AppointmentTimeslotService {
     }
 
 
-
-    public List<AppointmentTimeslot> getListAT(Long id){
+    public List<AppointmentTimeslot> getListAT(Long id) {
         return appointmentTimeslotRepository.findAllByAppointmentId(id);
     }
 
 
     public void update(List<Timeslot> timeslots, Appointment appointment) {
         List<AppointmentTimeslot> appointmentTimeslotList = getListAT(appointment.getId());
-        for (int i = 0; i < timeslots.size(); i++) {
-            appointmentTimeslotList.get(i).setTimeslot(timeslots.get(i));
-            appointmentTimeslotList.get(i).setAppointment(appointment);
-        }
-        appointmentTimeslotRepository.saveAll(appointmentTimeslotList);
+
+        AppointmentTimeslot appointmentTimeslot = appointmentTimeslotList.get(0);
+        appointmentTimeslot.setAppointment(appointment);
+        appointmentTimeslot.setTimeslot(timeslots.get(0));
+
+        appointmentTimeslotRepository.saveAll(
+                List.of(
+                        appointmentTimeslot,
+                        new AppointmentTimeslot(appointment, timeslots.get(1))
+                )
+        );
+
 
     }
 
-    public List<AppointmentTimeslot> getAllActiveBookings(Long chatId){
+    public void updateOneHourAppointmnent(List<Timeslot> timeslots, Appointment appointment) {
+        List<AppointmentTimeslot> appointmentTimeslotList = getListAT(appointment.getId());
+
+        AppointmentTimeslot appointmentTimeslot = appointmentTimeslotList.get(0);
+        appointmentTimeslot.setAppointment(appointment);
+        appointmentTimeslot.setTimeslot(timeslots.get(0));
+
+        appointmentTimeslotRepository.save(appointmentTimeslot);
+
+
+    }
+
+    public List<AppointmentTimeslot> getAllActiveBookings(Long chatId) {
         return appointmentTimeslotRepository.findAllByChatId(chatId);
     }
 
-    public AppointmentTimeslot getAllById(Long id){
+    public AppointmentTimeslot getAllById(Long id) {
         return appointmentTimeslotRepository.findAllById(id);
     }
 
-    public List<AppointmentTimeslot> getAllByIdIn(List<Long> ids){
+    public List<AppointmentTimeslot> getAllByIdIn(List<Long> ids) {
         return appointmentTimeslotRepository.findAllByAppointmentIdIn(ids);
     }
 

@@ -113,11 +113,15 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
         }
     }
 
-    private void editMessageText(EditMessageText editMessageText){
-        try{
-            execute(editMessageText);
-        } catch (TelegramApiException e){
-            LOGGER.error("", e);
+    private void editMessageText(EditMessageText editMessageText) {
+        if (editMessageText != null) {
+            try {
+                execute(editMessageText);
+            } catch (TelegramApiException e) {
+                LOGGER.error("", e);
+            }
+        } else {
+            LOGGER.error("EditMessageText object is null.");
         }
     }
 

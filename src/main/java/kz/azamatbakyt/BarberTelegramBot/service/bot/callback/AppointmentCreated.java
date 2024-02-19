@@ -62,14 +62,14 @@ public class AppointmentCreated implements CallbackHandler{
             appointmentTimeslots.stream()
                     .filter(appointmentTimeslot -> appointmentTimeslot.getAppointment().getId().equals(appointment.getId()))
                     .forEach(appointmentTimeslot ->
-                            msg.append(String.format(" %s - %s\n",
+                            msg.append(String.format("\n%s - %s",
                                     appointmentTimeslot.getTimeslot().getStartTime(),
                                     appointmentTimeslot.getTimeslot().getEndTime()
                             ))
                     );
-            msg.append("До скорой встречи!");
-            msg.append("\n");
+            msg.append("\n\n");
         }
+        msg.append("До скорой встречи!");
 
         messageText.setText(msg.toString());
 

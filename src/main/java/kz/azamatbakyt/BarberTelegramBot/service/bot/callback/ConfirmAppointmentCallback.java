@@ -22,6 +22,8 @@ import java.util.List;
 
 @Component
 public class ConfirmAppointmentCallback implements CallbackHandler{
+    
+    private final static String empty = "К сожалению на сегодня свободных таймслотов нету!";
     private final AppointmentService appointmentService;
     private final TimeslotService timeslotService;
     private final AppointmentTimeslotService appointmentTimeslotService;
@@ -38,14 +40,39 @@ public class ConfirmAppointmentCallback implements CallbackHandler{
 
         String chatId = TelegramUtils.getMessageChatId(update);
         int messageId = TelegramUtils.getMessageId(update);
+        if (callback.getData().equals("null")){
+            EditMessageText messageText = new EditMessageText();
+            messageText.setChatId(chatId);
+            messageText.setMessageId(messageId);
+            messageText.setText(empty);
+
+            appointmentService.deleteAppointment(
+                    appointmentService.getNotCreatedAppointmentByChatId(
+                            Long.valueOf(chatId), Status.DATE_SELECTED
+                    )
+            );
+            return build(messageText);
+        }
 
         LocalTime parsedTimeslot = LocalTime.parse(callback.getData());
         Appointment appointmentByChatId = appointmentService.getNotCreatedAppointmentByChatId(Long.valueOf(chatId), Status.DATE_SELECTED);
+
         int timeslotQty = appointmentByChatId.getService().getDuration() / 60;
         List<Timeslot> timeslotsToBook = timeslots(appointmentByChatId, parsedTimeslot);
         if (timeslotQty == 2 ){
+            String text = "Вы выбрали время " + timeslotsToBook.get(0).getStartTime() +
+                    " - " + timeslotsToBook.get(0).getEndTime() + "\n" +
+                    timeslotsToBook.get(1).getStartTime() + " - " + timeslotsToBook.get(1).getEndTime() +
+                    ". \nБронировать на это время?.";
 
-
+            EditMessageText messageText = new EditMessageText();
+            messageText.setChatId(chatId);
+            messageText.setMessageId(messageId);
+            appointmentTimeslotService.update(timeslotsToBook, appointmentByChatId);
+            appointmentService.updateAppointmnetByStatus(Long.valueOf(chatId), Status.DATE_SELECTED, Status.TIMESLOT_SELECTED);
+            messageText.setText(text);
+            messageText.setReplyMarkup(keyboardForConfirmAppointment(timeslotsToBook.get(0)));
+            return build(messageText);
         }
 
         Timeslot timeslot = timeslotsToBook.get(0);
@@ -59,7 +86,7 @@ public class ConfirmAppointmentCallback implements CallbackHandler{
         messageText.setText(text);
         messageText.setReplyMarkup(keyboardForConfirmAppointment(timeslot));
 
-        appointmentTimeslotService.update(timeslotsToBook, appointmentByChatId);
+        appointmentTimeslotService.updateOneHourAppointmnent(timeslotsToBook, appointmentByChatId);
         appointmentService.updateAppointmnetByStatus(Long.valueOf(chatId), Status.DATE_SELECTED, Status.TIMESLOT_SELECTED);
         return build(messageText);
     }
@@ -69,10 +96,9 @@ public class ConfirmAppointmentCallback implements CallbackHandler{
         int duration = appointmentByChatId.getService().getDuration();
         int timeslotQty = duration / 60;
         for (int i = 0; i < timeslotQty; i++) {
-            times.add(parsedTimeslot.plusHours(i));
+            times.add(parsedTimeslot.plusHours(i).withMinute(0).withSecond(0));
         }
         List<Timeslot> timeslots = timeslotService.getTimeslots(times);
-
         return timeslots;
     }
 

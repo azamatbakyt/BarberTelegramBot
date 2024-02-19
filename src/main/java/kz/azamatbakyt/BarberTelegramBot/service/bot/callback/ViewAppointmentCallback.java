@@ -21,7 +21,7 @@ public class ViewAppointmentCallback implements CallbackHandler {
     private final static String text = "Клиент: %s" + ".\n"
             + "Услуга: %s" + ".\n"
             + "Дата: %s" + ".\n"
-            + "Время: %s" + ".\n"
+            + "Время:\n%s" + ".\n"
             + "До скорой встречи %s" + "!";
 
     private final AppointmentTimeslotService appointmentTimeslotService;
@@ -39,6 +39,8 @@ public class ViewAppointmentCallback implements CallbackHandler {
         EditMessageText messageText = new EditMessageText();
         String date = appointmentTimeslot.getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
         String time = appointmentTimeslot.getTimeslot().getStartTime() + " - " + appointmentTimeslot.getTimeslot().getEndTime();
+        messageText.setChatId(chatId);
+        messageText.setMessageId(messageId);
         messageText.setText(
                 String.format(
                         text,

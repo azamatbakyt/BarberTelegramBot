@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleService {
@@ -36,9 +38,16 @@ public class ScheduleService {
             days.add(currendDate.plusDays(i));
         }
 
+        return days
+                .stream()
+                .filter(day -> {
+                    if (LocalDate.now().equals(day)){
+                        return LocalTime.now().isBefore(LocalTime.of(21, 0, 0));
+                    }
 
-
-        return days;
+                    return true;
+                }
+                ).collect(Collectors.toList());
     }
 
     public void saveSchedule(Schedule schedule){

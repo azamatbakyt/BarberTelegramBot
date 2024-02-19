@@ -1,6 +1,9 @@
 package kz.azamatbakyt.BarberTelegramBot.service.bot.command;
 
+import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.CustomerServiceGroup;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
+import kz.azamatbakyt.BarberTelegramBot.service.AppointmentService;
 import kz.azamatbakyt.BarberTelegramBot.service.CustomerServiceGroupService;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.JsonHandler;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.TelegramUtils;
@@ -21,13 +24,21 @@ public class ServicesGroupsCommand implements Command {
 
     private final CustomerServiceGroupService customerServiceGroupService;
 
-    public ServicesGroupsCommand(CustomerServiceGroupService customerServiceGroupService) {
+    private final AppointmentService appointmentService;
+
+    public ServicesGroupsCommand(CustomerServiceGroupService customerServiceGroupService, AppointmentService appointmentService) {
         this.customerServiceGroupService = customerServiceGroupService;
+        this.appointmentService = appointmentService;
     }
 
     @Override
     public List<Message> apply(Update update) {
         String chatId = TelegramUtils.getStringChatId(update);
+        Appointment notCreatedAppointmentByChatId = appointmentService.getNotCreatedAppointmentByChatId(Long.valueOf(chatId), Status.SERVICE_SELECTED);
+        if (notCreatedAppointmentByChatId != null){
+            appointmentService.deleteAppointment(notCreatedAppointmentByChatId);
+        }
+
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(ALL_SERVICES);
