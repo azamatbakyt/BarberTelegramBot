@@ -34,10 +34,6 @@ public class ServicesGroupsCommand implements Command {
     @Override
     public List<Message> apply(Update update) {
         String chatId = TelegramUtils.getStringChatId(update);
-        Appointment notCreatedAppointmentByChatId = appointmentService.getNotCreatedAppointmentByChatId(Long.valueOf(chatId), Status.SERVICE_SELECTED);
-        if (notCreatedAppointmentByChatId != null){
-            appointmentService.deleteAppointment(notCreatedAppointmentByChatId);
-        }
 
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
