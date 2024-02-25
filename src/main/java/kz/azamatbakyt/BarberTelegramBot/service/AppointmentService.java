@@ -3,6 +3,7 @@ package kz.azamatbakyt.BarberTelegramBot.service;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.*;
 import kz.azamatbakyt.BarberTelegramBot.exception.EntityNotFoundException;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentRepository;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomScheduleRepository;
@@ -24,6 +25,7 @@ public class AppointmentService {
     private final AppointmentTimeslotRepository appointmentTimeslotRepository;
     private final CustomScheduleRepository customScheduleRepository;
     private final ScheduleRepository scheduleRepository;
+
 
     @Autowired
     public AppointmentService(AppointmentRepository appointmentRepository,
@@ -62,9 +64,10 @@ public class AppointmentService {
                 .collect(Collectors.toList());
 
         if (service.getDuration() > Duration.ofHours(1).toMinutes()) {
-            final var result= new ArrayList<Timeslot>();
+            final var result = new ArrayList<Timeslot>();
             availableTimeslots.forEach(timeslot -> {
-                final var timeslotQty =  (int) Math.ceil((double) service.getDuration() / Duration.ofHours(1).toMinutes());                boolean isOk = true;
+                final var timeslotQty = (int) Math.ceil((double) service.getDuration() / Duration.ofHours(1).toMinutes());
+                boolean isOk = true;
                 for (int i = 0; i < timeslotQty; i++) {
                     if (isOk) {
                         final LocalTime startTime = timeslot.getStartTime().plusHours(i);
@@ -81,7 +84,14 @@ public class AppointmentService {
             return result;
         }
 
-        return availableTimeslots;
+        return availableTimeslots.stream()
+                .filter(timeslot -> {
+                            if (LocalDate.now().equals(date)) {
+                                return LocalTime.now().isBefore(timeslot.getStartTime());
+                            }
+                            return true;
+                        }
+                ).collect(Collectors.toList());
     }
 
     public List<Timeslot> getBookedTimeslotsOnDate(LocalDate date) {
@@ -108,12 +118,7 @@ public class AppointmentService {
         }
     }
 
-    public void createAppointment(
-            CustomerService service,
-            LocalDate date,
-            Client client) {
-        appointmentRepository.save(new Appointment(client, service, date));
-    }
+
 
     public List<Appointment> getAll() {
         return appointmentRepository.findAll();
@@ -130,5 +135,44 @@ public class AppointmentService {
 
     public void delete(Long id) {
         appointmentRepository.deleteById(id);
+    }
+
+    public Appointment updateDateOfBookingByChatId(Long chatId, LocalDate newDateOfBook, Status statusToUpdate) {
+        Appointment appointmentToUpdate = appointmentRepository.findAllByStatusAndAndClientChatId(chatId, Status.SERVICE_SELECTED.toString());
+        appointmentToUpdate.setDateOfBooking(newDateOfBook);
+        appointmentToUpdate.setStatus(statusToUpdate.toString());
+        return appointmentRepository.save(appointmentToUpdate);
+        // Appointment is completed now
+    }
+
+    public void updateAppointmnetByStatus(Long chatId, Status statusBefore, Status statusAfter){
+        Appointment appointment = appointmentRepository.findAllByStatusAndAndClientChatId(chatId, statusBefore.toString());
+        appointment.setStatus(statusAfter.toString());
+        appointmentRepository.save(appointment);
+    }
+
+
+
+    public Appointment getNotCreatedAppointmentByChatId(Long chatId, Status status) {
+        return appointmentRepository.findByChatId(chatId, status.toString());
+    }
+
+    public void setAppointmentCreated(Long chatId, Status status){
+        Appointment appointment = getNotCreatedAppointmentByChatId(chatId, status);
+        appointment.setStatus(status.toString());
+        appointmentRepository.save(appointment);
+    }
+
+
+    public List<Appointment> getActiveAppointments(Long chatId){
+        return appointmentRepository.findAllByCreatedAppointment(chatId);
+    }
+
+    public void deleteAppointment(Appointment appointment){
+        appointmentRepository.delete(appointment);
+    }
+
+    public Appointment getCanceledApppointment(Status status){
+        return appointmentRepository.findCanceledAppointmnet(status.toString());
     }
 }

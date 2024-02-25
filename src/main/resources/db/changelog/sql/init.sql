@@ -57,7 +57,7 @@ create table if not exists custom_schedule
 (
     id bigserial primary key,
     custom_date DATE,
-    timeslot_id bigint not null references timeslot(id) on delete cascade,
+    timeslot_id bigint references timeslot(id) on delete cascade,
     unique(custom_date, timeslot_id)
     );
 
@@ -65,15 +65,15 @@ create table if not exists appointment(
     id bigserial primary key,
     client_id bigint not null references client(id) on delete cascade,
     service_id bigint not null references customer_service(id) on delete cascade,
-    date_of_booking DATE
+    date_of_booking DATE,
+    status varchar(255)
 );
 
 create table if not exists appointment_timeslot(
     id bigserial primary key,
-    appointment_id bigint not null references appointment(id) on delete cascade,
-    timeslot_id bigint not null references timeslot(id) on delete cascade,
-    unique(appointment_id, timeslot_id)
-);
+    appointment_id bigint references appointment(id) on delete cascade,
+    timeslot_id bigint references timeslot(id) on delete cascade
+    );
 
 CREATE TABLE if not exists role
 (

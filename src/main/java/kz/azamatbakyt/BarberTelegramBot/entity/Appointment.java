@@ -1,6 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.entity;
 
 import jakarta.persistence.*;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -26,19 +27,35 @@ public class Appointment {
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     private LocalDate dateOfBooking;
 
+    private String status;
+
     public Appointment() {}
 
-    public Appointment(Long id, Client client, CustomerService service, LocalDate dateOfBooking) {
+
+    public Appointment(Long id,
+                       Client client,
+                       CustomerService service,
+                       LocalDate dateOfBooking,
+                       String status){
         this.id = id;
         this.client = client;
         this.service = service;
         this.dateOfBooking = dateOfBooking;
+        this.status = status;
+
     }
 
-    public Appointment(Client client, CustomerService service, LocalDate dateOfBooking) {
+    public Appointment(Client client, CustomerService service, LocalDate dateOfBooking, String status) {
         this.client = client;
         this.service = service;
         this.dateOfBooking = dateOfBooking;
+        this.status = status;
+    }
+
+    public Appointment(Client client, CustomerService service, String status) {
+        this.client = client;
+        this.service = service;
+        this.status = status;
     }
 
     public Long getId() {
@@ -77,13 +94,22 @@ public class Appointment {
         this.dateOfBooking = dateOfBooking;
     }
 
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
-        return "Appointments{" +
+        return "Appointment{" +
                 "id=" + id +
                 ", client=" + client +
                 ", service=" + service +
-                ", date_of_booking=" + dateOfBooking +
+                ", dateOfBooking=" + dateOfBooking +
                 '}';
     }
 }

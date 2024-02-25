@@ -116,9 +116,10 @@
         <tbody>
         <tr th:each="appointment : ${appointments}">
             <td th:text="${appointment.getId()}"></td>
-            <td th:text="${appointment.getClient().getName()}"></td>
-            <td th:text="${appointment.getService().getName()}"></td>
-            <td th:text="${appointment.getDateOfBooking()}"></td>
+            <td th:text="${appointment.getAppointment().getClient().getName()}"></td>
+            <td th:text="${appointment.getAppointment().getService().getName()}"></td>
+            <td th:text="${appointment.getTimeslot().getStartTime() + '-' + appointment.getTimeslot().getEndTime()}"></td>
+            <td th:text="${appointment.getAppointment().getDateOfBooking()}"></td>
 
             <td>
                 <button type="button" class="btn btn-primary"><a style="color:white"
