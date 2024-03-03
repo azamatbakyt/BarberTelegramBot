@@ -23,12 +23,16 @@ public class CustomSchedule {
     @JoinColumn(name = "timeslot_id", referencedColumnName = "id")
     private Timeslot timeslot;
 
+    private Boolean dayOff;
+
+
     public CustomSchedule() {}
 
-    public CustomSchedule(Long id, LocalDate customDate, Timeslot timeslot) {
+    public CustomSchedule(Long id, LocalDate customDate, Timeslot timeslot, Boolean dayOff) {
         this.id = id;
         this.customDate = customDate;
         this.timeslot = timeslot;
+        this.dayOff = dayOff;
     }
 
     public Long getId() {
@@ -54,14 +58,21 @@ public class CustomSchedule {
         this.timeslot = timeslot;
     }
 
-    @Override
-    public String toString() {
-        return "CustomSchedules{" +
-                "id=" + id +
-                ", custom_LocalDate=" + customDate +
-                ", timeslot=" + timeslot +
-                '}';
+    public Boolean getDayOff() {
+        return dayOff;
     }
 
+    public void setDayOff(Boolean dayOff) {
+        this.dayOff = dayOff;
+    }
 
+    @Override
+    public String toString() {
+        return "CustomSchedule{" +
+                "id=" + id +
+                ", customDate=" + customDate +
+                ", timeslot=" + timeslot +
+                ", dayOff=" + dayOff +
+                '}';
+    }
 }

@@ -9,6 +9,7 @@ INSERT INTO timeslot (id, start_time, end_time) VALUES (10, '17:00:00', '18:00:0
 INSERT INTO timeslot (id, start_time, end_time) VALUES (11, '18:00:00', '19:00:00');
 INSERT INTO timeslot (id, start_time, end_time) VALUES (12, '19:00:00', '20:00:00');
 INSERT INTO timeslot (id, start_time, end_time) VALUES (13, '20:00:00', '21:00:00');
+INSERT INTO timeslot (id, start_time, end_time) VALUES (14, '00:00:00', '00:00:00');
 
 
 SELECT setval('timeslot_id_seq', COALESCE( (SELECT MAX(id)+1 FROM timeslot), 1), false);

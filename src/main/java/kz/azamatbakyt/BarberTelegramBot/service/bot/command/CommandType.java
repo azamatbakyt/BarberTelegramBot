@@ -4,7 +4,7 @@ public enum CommandType {
 
     START("/start"),
     SERVICE_GROUP("Услуги"),
-    HELP("Help"),
+    HELP("/help"),
     PORTFOLIO("Мои работы"),
     ACTIVE_APPOINTMENTS("Мои активные записи"),
     CONTACT_BARBER("Связаться с барбером"),

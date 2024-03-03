@@ -107,7 +107,9 @@ public class AppointmentService {
 
     private List<Timeslot> getTimeslotsOnDate(LocalDate date) {
         final var timeslots = customScheduleRepository.findCustomScheduleByCustomDate(date)
-                .stream().map(CustomSchedule::getTimeslot)
+                .stream()
+                .filter((dayOff) -> !dayOff.getDayOff())
+                .map(CustomSchedule::getTimeslot)
                 .collect(Collectors.toList());
         if (timeslots.isEmpty()) {
             return scheduleRepository.findScheduleByDayOfWeek(String.valueOf(date.getDayOfWeek().getValue()))
@@ -174,5 +176,27 @@ public class AppointmentService {
 
     public Appointment getCanceledApppointment(Status status){
         return appointmentRepository.findCanceledAppointmnet(status.toString());
+    }
+
+    public List<Timeslot> getTimeslotsForNonAvailableDay(
+            LocalDate date
+    ) {
+        final var allTimeslots = getTimeslotsOnDate(date);
+        final var bookedTimeslots = getBookedTimeslotsOnDate(date);
+
+        final var availableTimeslots = allTimeslots.stream()
+                .filter(t -> !bookedTimeslots.contains(t))
+                .collect(Collectors.toList());
+
+
+
+        return availableTimeslots.stream()
+                .filter(timeslot -> {
+                            if (LocalDate.now().equals(date)) {
+                                return LocalTime.now().isBefore(timeslot.getStartTime());
+                            }
+                            return true;
+                        }
+                ).collect(Collectors.toList());
     }
 }

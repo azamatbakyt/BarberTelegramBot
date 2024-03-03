@@ -79,11 +79,6 @@ INSERT INTO schedule (id, day_of_week, timeslot_id) VALUES (130, '6', 12);
 INSERT INTO schedule (id, day_of_week, timeslot_id) VALUES (131, '6', 13);
 
 
-INSERT INTO custom_schedule (id, custom_date, timeslot_id) VALUES (1, '2024-01-26', 3);
-INSERT INTO custom_schedule (id, custom_date, timeslot_id) VALUES (2, '2024-01-27', 4);
-INSERT INTO custom_schedule (id, custom_date, timeslot_id) VALUES (3, '2024-01-28', 5);
-INSERT INTO custom_schedule (id, custom_date, timeslot_id) VALUES (4, '2024-01-29', 6);
-INSERT INTO custom_schedule (id, custom_date, timeslot_id) VALUES (5, '2024-01-30', 7);
 
 -- SELECT setval('schedule_id_seq', COALESCE( (SELECT MAX(id)+1 FROM schedule), 1), false);
 -- SELECT setval('custom_schedule_id_seq', COALESCE( (SELECT MAX(id)+1 FROM custom_schedule), 1), false);

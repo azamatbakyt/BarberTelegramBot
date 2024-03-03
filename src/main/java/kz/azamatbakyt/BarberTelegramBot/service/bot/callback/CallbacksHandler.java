@@ -30,7 +30,6 @@ public class CallbacksHandler {
             DateCanceledCallback dateCanceledCallback,
             TimeslotCanceledCallback timeslotCanceledCallback,
             AppointmentNotCreatedCallback appointmentNotCreatedCallback,
-            ViewAppointmentCallback viewAppointmentCallback,
             DeleteAppointmentCallback deleteAppointmentCallback,
             EmptyTimeslotCallback emptyTimeslotCallback
     ) {
@@ -45,7 +44,6 @@ public class CallbacksHandler {
                 entry(CallbackType.DATE_CANCELED, dateCanceledCallback),
                 entry(CallbackType.TIMESLOT_CANCELED, timeslotCanceledCallback),
                 entry(CallbackType.APPOINTMENT_NOT_CREATED, appointmentNotCreatedCallback),
-                entry(CallbackType.VIEW_APPOINTMENT, viewAppointmentCallback),
                 entry(CallbackType.DELETED_APPOINTMENT, deleteAppointmentCallback),
                 entry(CallbackType.EMPTY_TIMESLOTS, emptyTimeslotCallback)
         );

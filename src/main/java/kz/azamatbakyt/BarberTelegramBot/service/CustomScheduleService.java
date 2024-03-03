@@ -29,6 +29,8 @@ public class CustomScheduleService {
         customScheduleRepository.save(customSchedule);
     }
 
+
+
     public CustomSchedule getCustomSchedule(Long id){
         return customScheduleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Кастомное расписание не найдено"));

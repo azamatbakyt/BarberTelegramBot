@@ -98,20 +98,27 @@
 </nav>
 
 <div class="customSchedule-form">
-    <h1 class="mt-4">Create a new schedule</h1>
+    <h1 class="mt-4">Расписание</h1>
     <form action="#" th:action="@{/custom-schedules/save}" th:object="${newCustomSchedule}" method="post">
         <div class="form-group">
-            <label for="custom-date">Enter custom date</label>
+            <label for="custom-date">Выберите дату</label>
             <input type="date" class="form-control" id="custom-date" th:field="*{customDate}">
 
             <div class="form-group">
-                <label for="start_time">Choose the time</label>
+                <label for="start_time">Выберите время</label>
                 <select class="form-control" id="start_time" th:field="*{timeslot}">
                     <option th:each="timeslot : ${timeslotsForCustomSchedules}" th:value="${timeslot.id}"
                             th:text="${timeslot.getStartTime()} + ' - ' + ${timeslot.getEndTime()}"></option>
                 </select>
             </div>
 
+            <div class="form-group">
+                <label for="day_off">Выходной</label>
+                <select class="form-control" id="day_off" th:field="*{dayOff}">
+                    <option th:value="false" th:text="Нет"></option>
+                    <option th:value="true" th:text="Да"></option>
+                </select>
+            </div>
 
             <button type="submit" class="btn btn-primary">Submit</button>
             <button type="reset" class="btn btn-secondary">Reset</button>
