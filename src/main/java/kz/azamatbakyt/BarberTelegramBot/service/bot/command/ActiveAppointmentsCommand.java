@@ -2,6 +2,7 @@ package kz.azamatbakyt.BarberTelegramBot.service.bot.command;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.AppointmentTimeslot;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.service.AppointmentService;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
@@ -33,7 +34,7 @@ public class ActiveAppointmentsCommand implements Command {
         long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        List<Appointment> appointments = appointmentService.getActiveAppointments(chatId);
+        List<Appointment> appointments = appointmentService.getActiveAppointments(chatId, Status.BOOKING_SUCCESSFUL);
         List<AppointmentTimeslot> appointmentTimeslots = appointmentTimeslotRepository.findAllByAppointmentIdIn(
                 appointments.stream().map(Appointment::getId).collect(Collectors.toList())
         );

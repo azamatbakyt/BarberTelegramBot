@@ -41,7 +41,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
+        <a class="navbar-brand" th:href="${'/appointments'}">Записи</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -50,34 +50,34 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/services'}">Services</a>
+                    <a class="nav-link" th:href="${'/services'}">Услуги</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/groups'}">Service Groups</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/timeslots'}">Timeslots</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/schedules'}">Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/custom-schedules'}">Custom Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/clients'}">Clients</a>
+                    <a class="nav-link" th:href="${'/groups'}">Категории</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/portfolio'}">Portfolio</a>
+                    <a class="nav-link" th:href="${'/timeslots'}">Временные слоты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/schedules'}">Стандартное расписание</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/custom-schedules'}">Свое расписание</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/clients'}">Клиенты</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/portfolio'}">Мои работы</a>
                 </li>
 
 
 
                 <div sec:authorize="hasRole('ROLE_ADMIN')">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="${'/users'}">Admin Panel</a>
+                        <a class="nav-link" th:href="${'/users'}">Панель админа</a>
                     </li>
                 </div>
 
@@ -87,24 +87,23 @@
 
         <div class="logout-btn">
             <button type="button" class="btn btn-primary">
-                <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
+                <a style="color:white" class="nav-link" th:href="${'/logout'}">Выйти</a>
             </button>
         </div>
 
 
     </div>
 </nav>
-
 <div class="customSchedule-editForm">
-    <h1 class="mt-4">Editing the custom-schedule</h1>
+    <h1 class="mt-4">Редактирование своего расписания</h1>
     <form action="#" th:action="@{/custom-schedules/{id}(id=${customScheduleToUpdate.getId()})}"
           th:object="${customScheduleToUpdate}" method="post">
         <div class="form-group">
-            <label for="custom_date">Choose custom-date</label>
+            <label for="custom_date">Выбрать дату</label>
             <input type="date" class="form-control" id="custom_date" th:field="*{customDate}">
 
             <div class="form-group">
-                <label for="start_time">Choose the correct time</label>
+                <label for="start_time">Выбрать время</label>
                 <select class="form-control" id="start_time" th:field="*{timeslot}">
                     <option th:each="timeslot : ${timeslotsForCustomSchedules}" th:value="${timeslot.id}"
                             th:text="${timeslot.getStartTime()} + ' - ' + ${timeslot.getEndTime()}"></option>
@@ -112,8 +111,8 @@
             </div>
 
 
-            <button type="submit" class="btn btn-primary">Submit</button>
-            <button type="reset" class="btn btn-secondary">Reset</button>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="reset" class="btn btn-secondary">Сбросить</button>
         </div>
     </form>
 </div>

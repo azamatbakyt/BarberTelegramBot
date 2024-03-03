@@ -159,15 +159,8 @@ public class AppointmentService {
         return appointmentRepository.findByChatId(chatId, status.toString());
     }
 
-    public void setAppointmentCreated(Long chatId, Status status){
-        Appointment appointment = getNotCreatedAppointmentByChatId(chatId, status);
-        appointment.setStatus(status.toString());
-        appointmentRepository.save(appointment);
-    }
-
-
-    public List<Appointment> getActiveAppointments(Long chatId){
-        return appointmentRepository.findAllByCreatedAppointment(chatId);
+    public List<Appointment> getActiveAppointments(Long chatId, Status status){
+        return appointmentRepository.findAllByCreatedAppointment(chatId, status.toString());
     }
 
     public void deleteAppointment(Appointment appointment){

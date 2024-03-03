@@ -1,6 +1,7 @@
 package kz.azamatbakyt.BarberTelegramBot.controller;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
+import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,8 @@ public class AppointmentController {
     }
 
     @PostMapping("/save")
-    public String createAppointment(@ModelAttribute Appointment appointment) {
+    public String createAppointment(@ModelAttribute Appointment appointment,
+                                    @ModelAttribute Timeslot timeslot) {
         appointmentService.save(appointment);
 
         return "redirect:/appointments";

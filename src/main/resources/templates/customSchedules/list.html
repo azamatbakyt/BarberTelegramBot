@@ -43,7 +43,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
+        <a class="navbar-brand" th:href="${'/appointments'}">Записи</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -52,34 +52,34 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/services'}">Services</a>
+                    <a class="nav-link" th:href="${'/services'}">Услуги</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/groups'}">Service Groups</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/timeslots'}">Timeslots</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/schedules'}">Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/custom-schedules'}">Custom Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/clients'}">Clients</a>
+                    <a class="nav-link" th:href="${'/groups'}">Категории</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/portfolio'}">Portfolio</a>
+                    <a class="nav-link" th:href="${'/timeslots'}">Временные слоты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/schedules'}">Стандартное расписание</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/custom-schedules'}">Свое расписание</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/clients'}">Клиенты</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/portfolio'}">Мои работы</a>
                 </li>
 
 
 
                 <div sec:authorize="hasRole('ROLE_ADMIN')">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="${'/users'}">Admin Panel</a>
+                        <a class="nav-link" th:href="${'/users'}">Панель админа</a>
                     </li>
                 </div>
 
@@ -89,7 +89,7 @@
 
         <div class="logout-btn">
             <button type="button" class="btn btn-primary">
-                <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
+                <a style="color:white" class="nav-link" th:href="${'/logout'}">Выйти</a>
             </button>
         </div>
 
@@ -101,7 +101,7 @@
 
 <div class="create-btn">
     <button type="button" class="btn btn-primary">
-        <a style="color:white" class="nav-link" th:href="${'/custom-schedules/new'}">Create a new custom-schedule</a>
+        <a style="color:white" class="nav-link" th:href="${'/custom-schedules/new'}">Создать новое расписание</a>
     </button>
 </div>
 
@@ -110,9 +110,10 @@
         <thead class="table-dark">
         <tr>
             <th scope="col">Id</th>
-            <th scope="col">Exact date</th>
-            <th scope="col">Timeslot</th>
-            <th scope="col">Actions</th>
+            <th scope="col">Дата</th>
+            <th scope="col">Выходной</th>
+            <th scope="col">Время</th>
+            <th scope="col">Действие</th>
 
 
         </tr>
@@ -121,16 +122,17 @@
         <tr th:each="schedule : ${customSchedules}">
             <td th:text="${schedule.getId()}"></td>
             <td th:text="${schedule.getCustomDate()}"></td>
+            <td th:text="${schedule.getDayOff() ? 'Да' : 'Нет'}"></td>
             <td th:text="${schedule.getTimeslot().getStartTime()} + ' - ' + ${schedule.getTimeslot().getEndTime()}"></td>
 
 
             <td>
                 <button type="button" class="btn btn-primary"><a style="color:white"
-                                                                 th:href="${'/custom-schedules/' + schedule.id + '/edit'}">Edit</a>
+                                                                 th:href="${'/custom-schedules/' + schedule.id + '/edit'}">Редактировать</a>
                 </button>
 
                 <button type="button" class="btn btn-danger"><a style="color:white"
-                                                                th:href="${'/custom-schedules/' + schedule.id + '/delete'}">Delete</a>
+                                                                th:href="${'/custom-schedules/' + schedule.id + '/delete'}">Удалить</a>
                 </button>
             </td>
 

@@ -45,7 +45,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" th:href="${'/appointments'}">Appointments</a>
+        <a class="navbar-brand" th:href="${'/appointments'}">Записи</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -54,34 +54,34 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/services'}">Services</a>
+                    <a class="nav-link" th:href="${'/services'}">Услуги</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/groups'}">Service Groups</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/timeslots'}">Timeslots</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/schedules'}">Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/custom-schedules'}">Custom Schedules</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" th:href="${'/clients'}">Clients</a>
+                    <a class="nav-link" th:href="${'/groups'}">Категории</a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" th:href="${'/portfolio'}">Portfolio</a>
+                    <a class="nav-link" th:href="${'/timeslots'}">Временные слоты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/schedules'}">Стандартное расписание</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/custom-schedules'}">Свое расписание</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/clients'}">Клиенты</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" th:href="${'/portfolio'}">Мои работы</a>
                 </li>
 
 
 
                 <div sec:authorize="hasRole('ROLE_ADMIN')">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="${'/users'}">Admin Panel</a>
+                        <a class="nav-link" th:href="${'/users'}">Панель админа</a>
                     </li>
                 </div>
 
@@ -91,7 +91,7 @@
 
         <div class="logout-btn">
             <button type="button" class="btn btn-primary">
-                <a style="color:white" class="nav-link" th:href="${'/logout'}">Logout</a>
+                <a style="color:white" class="nav-link" th:href="${'/logout'}">Выйти</a>
             </button>
         </div>
 
@@ -99,25 +99,25 @@
     </div>
 </nav>
 <div class="service-editForm">
-    <h1 class="mt-4">Editing the service</h1>
+    <h1 class="mt-4">Редактирование услуги</h1>
     <form th:action="@{/services/{id}(id=${updatedService.getId()})}" th:object="${updatedService}" method="post">
         <div class="form-group">
-            <label for="name">Service Name</label>
+            <label for="name">Название услуги</label>
             <input type="text" class="form-control" id="name" th:field="*{name}">
             <div class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
         </div>
         <div class="form-group">
-            <label for="price">Price</label>
+            <label for="price">Цена</label>
             <input type="text" class="form-control" id="price" th:field="*{price}">
             <div class="error-message" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
         </div>
         <div class="form-group">
-            <label for="duration">Duration (in minutes)</label>
+            <label for="duration">Длительность в минутах</label>
             <input type="text" class="form-control" id="duration" th:field="*{duration}">
             <div class="error-message" th:if="${#fields.hasErrors('duration')}" th:errors="*{duration}"></div>
         </div>
         <div class="form-group">
-            <label for="group">Service Group</label>
+            <label for="group">Категория</label>
             <select class="form-control" id="group" th:field="*{group}">
                 <option th:each="serviceGroup : ${serviceGroups}" th:value="${serviceGroup.id}"
                         th:text="${serviceGroup.name}"></option>
@@ -125,8 +125,8 @@
             <div class="error-message" th:if="${#fields.hasErrors('group')}" th:errors="*{group}"></div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Submit</button>
-        <button type="reset" class="btn btn-secondary">Reset</button>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <button type="reset" class="btn btn-secondary">Сбросить</button>
     </form>
 </div>
 

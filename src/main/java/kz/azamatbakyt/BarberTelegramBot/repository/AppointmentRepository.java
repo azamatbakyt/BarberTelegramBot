@@ -25,10 +25,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             value = "select appointment.* " +
                     "from appointment " +
                     "join client on appointment.client_id=client.id " +
-                    "where client.chat_id=? and appointment.status='BOOKING_SUCCESSFUL'"
+                    "where client.chat_id=? and appointment.status=?"
 
     )
-    List<Appointment> findAllByCreatedAppointment(Long chatId);
+    List<Appointment> findAllByCreatedAppointment(Long chatId, String status);
 
 
     @Query(nativeQuery = true,

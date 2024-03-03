@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/perform-login")
                         .successForwardUrl("/users")
-                        .defaultSuccessUrl("/appointments", true)
+                        .defaultSuccessUrl("/services", true)
                         .failureUrl("/login?error")
                         .usernameParameter("username")
                         .passwordParameter("password")
