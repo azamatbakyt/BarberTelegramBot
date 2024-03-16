@@ -5,9 +5,12 @@ import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/appointments")
@@ -17,15 +20,16 @@ public class AppointmentController {
     private final TimeslotService timeslotService;
     private final ClientService clientService;
     private final CSService csService;
-
+    private final ScheduleService scheduleService;
     private final AppointmentTimeslotService appointmentTimeslotService;
     @Autowired
     public AppointmentController(AppointmentService appointmentService, TimeslotService timeslotService,
-                                 ClientService clientService, CSService csService, AppointmentTimeslotService appointmentTimeslotService) {
+                                 ClientService clientService, CSService csService, ScheduleService scheduleService, AppointmentTimeslotService appointmentTimeslotService) {
         this.appointmentService = appointmentService;
         this.timeslotService = timeslotService;
         this.clientService = clientService;
         this.csService = csService;
+        this.scheduleService = scheduleService;
 
         this.appointmentTimeslotService = appointmentTimeslotService;
     }
@@ -33,10 +37,18 @@ public class AppointmentController {
     @GetMapping
     public String getAppointments(Model model) {
         model.addAttribute("appointments", appointmentTimeslotService.getAll());
-
+        model.addAttribute("getDays", scheduleService.getDays());
+        model.addAttribute("showAllAppointments", true);
         return "appointments/list";
     }
 
+    @GetMapping("/bydate")
+    public String getAppointmentsByDate(Model model, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+        model.addAttribute("appointmentByDate", appointmentTimeslotService.getAllByDate(date));
+        model.addAttribute("getDays", scheduleService.getDays());
+        model.addAttribute("showAllAppointments", false);
+        return "appointments/list";
+    }
 
     @GetMapping("/new")
     public String newAppointment(Model model) {

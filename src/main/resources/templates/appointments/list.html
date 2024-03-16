@@ -112,27 +112,58 @@
     </div>
 </nav>
 
+
+
+
 <div class="container appointment-table">
-    <table class="table table-bordered">
-        <thead class="table-dark">
-        <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Клиент</th>
-            <th scope="col">Услуга</th>
-            <th scope="col">Время</th>
-            <th scope="col">Дата</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="appointment : ${appointments}">
-            <td th:text="${appointment.getId()}"></td>
-            <td th:text="${appointment.getAppointment().getClient().getName()}"></td>
-            <td th:text="${appointment.getAppointment().getService().getName()}"></td>
-            <td th:text="${appointment.getTimeslot().getStartTime() + '-' + appointment.getTimeslot().getEndTime()}"></td>
-            <td th:text="${appointment.getAppointment().getDateOfBooking()}"></td>
-        </tr>
-        </tbody>
-    </table>
+
+
+    <form th:action="@{/appointments/bydate}" method="get">
+        <div class="form-group">
+            <label for="group" style="color: white">Выберите дату</label>
+            <select class="form-control" id="group" name="date">
+                <option th:each="day : ${getDays}" th:value="${day}" th:text="${day}"></option>
+            </select>
+        </div>
+        <input type="submit" value="Показать записи">
+
+        <table class="table table-bordered">
+            <thead class="table-dark">
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Клиент</th>
+                <th scope="col">Услуга</th>
+                <th scope="col">Время</th>
+                <th scope="col">Дата</th>
+            </tr>
+            </thead>
+            <tbody th:if="${showAllAppointments}">
+            <!-- Вывод всех записей -->
+            <tr th:each="appointment : ${appointments}">
+                <td th:text="${appointment.getId()}"></td>
+                <td th:text="${appointment.getAppointment().getClient().getName()}"></td>
+                <td th:text="${appointment.getAppointment().getService().getName()}"></td>
+                <td th:text="${appointment.getTimeslot().getStartTime() + '-' + appointment.getTimeslot().getEndTime()}"></td>
+                <td th:text="${appointment.getAppointment().getDateOfBooking()}"></td>
+            </tr>
+            </tbody>
+            <tbody th:if="${not showAllAppointments}">
+            <!-- Вывод записей только по выбранной дате -->
+            <tr th:each="appointment : ${appointmentByDate}">
+                <td th:text="${appointment.getId()}"></td>
+                <td th:text="${appointment.getAppointment().getClient().getName()}"></td>
+                <td th:text="${appointment.getAppointment().getService().getName()}"></td>
+                <td th:text="${appointment.getTimeslot().getStartTime() + '-' + appointment.getTimeslot().getEndTime()}"></td>
+                <td th:text="${appointment.getAppointment().getDateOfBooking()}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+    </form>
+
+
+
+
 </div>
 
 </body>

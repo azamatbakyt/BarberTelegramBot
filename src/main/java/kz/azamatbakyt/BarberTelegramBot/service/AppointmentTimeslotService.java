@@ -3,11 +3,11 @@ package kz.azamatbakyt.BarberTelegramBot.service;
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.AppointmentTimeslot;
 import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
-import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -70,6 +70,10 @@ public class AppointmentTimeslotService {
 
     public List<AppointmentTimeslot> getAllByIdIn(List<Long> ids) {
         return appointmentTimeslotRepository.findAllByAppointmentIdIn(ids);
+    }
+
+    public List<AppointmentTimeslot> getAllByDate(LocalDate date){
+        return appointmentTimeslotRepository.findAllByDateOfBooking(date);
     }
 
 }
