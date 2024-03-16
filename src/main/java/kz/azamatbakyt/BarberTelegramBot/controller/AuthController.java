@@ -29,7 +29,7 @@ public class AuthController {
         return "auth/login";
     }
 
-    @GetMapping("/register")
+    @GetMapping("/newEmp")
     public String registerPage(Model model) {
         model.addAttribute("user", new User());
         return "auth/register";
@@ -39,7 +39,7 @@ public class AuthController {
     public String submitForm(@ModelAttribute User user, Model model) {
         model.addAttribute("user", user);
         userService.save(user);
-        return "users/list";
+        return "redirect:/users";
     }
 
     @GetMapping("/logout")
