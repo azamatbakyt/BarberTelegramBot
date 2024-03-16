@@ -107,7 +107,9 @@ public class AppointmentService {
 
     private List<Timeslot> getTimeslotsOnDate(LocalDate date) {
         final var timeslots = customScheduleRepository.findCustomScheduleByCustomDate(date)
-                .stream().map(CustomSchedule::getTimeslot)
+                .stream()
+                .filter((dayOff) -> !dayOff.getDayOff())
+                .map(CustomSchedule::getTimeslot)
                 .collect(Collectors.toList());
         if (timeslots.isEmpty()) {
             return scheduleRepository.findScheduleByDayOfWeek(String.valueOf(date.getDayOfWeek().getValue()))
@@ -157,15 +159,8 @@ public class AppointmentService {
         return appointmentRepository.findByChatId(chatId, status.toString());
     }
 
-    public void setAppointmentCreated(Long chatId, Status status){
-        Appointment appointment = getNotCreatedAppointmentByChatId(chatId, status);
-        appointment.setStatus(status.toString());
-        appointmentRepository.save(appointment);
-    }
-
-
-    public List<Appointment> getActiveAppointments(Long chatId){
-        return appointmentRepository.findAllByCreatedAppointment(chatId);
+    public List<Appointment> getActiveAppointments(Long chatId, Status status){
+        return appointmentRepository.findAllByCreatedAppointment(chatId, status.toString());
     }
 
     public void deleteAppointment(Appointment appointment){
@@ -174,5 +169,27 @@ public class AppointmentService {
 
     public Appointment getCanceledApppointment(Status status){
         return appointmentRepository.findCanceledAppointmnet(status.toString());
+    }
+
+    public List<Timeslot> getTimeslotsForNonAvailableDay(
+            LocalDate date
+    ) {
+        final var allTimeslots = getTimeslotsOnDate(date);
+        final var bookedTimeslots = getBookedTimeslotsOnDate(date);
+
+        final var availableTimeslots = allTimeslots.stream()
+                .filter(t -> !bookedTimeslots.contains(t))
+                .collect(Collectors.toList());
+
+
+
+        return availableTimeslots.stream()
+                .filter(timeslot -> {
+                            if (LocalDate.now().equals(date)) {
+                                return LocalTime.now().isBefore(timeslot.getStartTime());
+                            }
+                            return true;
+                        }
+                ).collect(Collectors.toList());
     }
 }

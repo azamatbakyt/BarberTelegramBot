@@ -20,15 +20,12 @@ import java.util.List;
 
 @Component
 public class ServicesGroupsCommand implements Command {
-    private final static String ALL_SERVICES = "What service would you want to choose?";
+    private final static String ALL_SERVICES = "Какую категорию вы бы хотели выбрать?";
 
     private final CustomerServiceGroupService customerServiceGroupService;
 
-    private final AppointmentService appointmentService;
-
     public ServicesGroupsCommand(CustomerServiceGroupService customerServiceGroupService, AppointmentService appointmentService) {
         this.customerServiceGroupService = customerServiceGroupService;
-        this.appointmentService = appointmentService;
     }
 
     @Override

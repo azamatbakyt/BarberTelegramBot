@@ -33,17 +33,14 @@ public class TelegramUtils {
         KeyboardRow row = new KeyboardRow();
 
         row.add(CommandType.SERVICE_GROUP.getCommandText());
-        row.add("Мои работы");
+        row.add(CommandType.PORTFOLIO.getCommandText());
         rows.add(row);
 
         row = new KeyboardRow();
-        row.add("Мои активные записи");
-        row.add("Связаться с барбером");
+        row.add(CommandType.ACTIVE_APPOINTMENTS.getCommandText());
+        row.add(CommandType.CONTACT_BARBER.getCommandText());
         rows.add(row);
 
-        row = new KeyboardRow();
-        row.add("Управление бронированием");
-        rows.add(row);
         keyboard.setKeyboard(rows);
 
         return keyboard;

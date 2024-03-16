@@ -4,23 +4,25 @@ import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
 import kz.azamatbakyt.BarberTelegramBot.exception.EntityNotFoundException;
 import kz.azamatbakyt.BarberTelegramBot.repository.TimeslotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 
 public class TimeslotService {
 
     private final TimeslotRepository timeslotRepository;
+    private final AppointmentService appointmentService;
+    private final ScheduleService scheduleService;
 
     @Autowired
-    public TimeslotService(TimeslotRepository timeslotRepository) {
+    public TimeslotService(TimeslotRepository timeslotRepository, AppointmentService appointmentService, ScheduleService scheduleService) {
         this.timeslotRepository = timeslotRepository;
+        this.appointmentService = appointmentService;
+        this.scheduleService = scheduleService;
     }
 
     public List<Timeslot> getAll(){
@@ -43,15 +45,20 @@ public class TimeslotService {
         timeslotRepository.deleteById(id);
     }
 
-    public Timeslot getTimeslotByStartTime(LocalTime startTime){
-        return timeslotRepository.findTimeslotByStartTime(startTime);
-    }
 
     public List<Timeslot> getTimeslots(List<LocalTime> times){
         return timeslotRepository.findAllByStartTimeIn(times);
     }
 
-    public List<Timeslot> getAllActiveTimeslotByChatId(Long chatId){
-        return timeslotRepository.findAllActiveTimeslots(chatId);
-    }
+
+//    public List<Timeslot> getFreeTimeslots(){
+//        final var days = scheduleService.getDays();
+//        final List<Timeslot> freeTimeslots = new ArrayList<>();
+//        for (int i = 0; i < days.size(); i++) {
+//            final var timeslotsByDate = appointmentService.get
+//        }
+//
+//
+//        return freeTimeslots;
+//    }
 }

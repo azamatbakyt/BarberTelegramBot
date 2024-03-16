@@ -10,13 +10,14 @@ import java.util.List;
 
 @Component
 public class HelpCommand  implements Command {
-    private final static String HELP_TEXT = "This bot is created to demonstrate Spring capabilities.\n\n" +
-            "You can execute commands from the main menu on the left or by typing commands:\n\n" +
-            "Type /start to see welcome message\n\n" +
-            "Type /services to see welcome message\n\n" +
-            "Type /register to register yourself\n\n" +
-            "Type /mydata to see data stored about yourself\n\n" +
-            "Type /help to see this message again";
+    private final static String HELP_TEXT = "Этот бот создан для бронирования моих услуг.\n\n" +
+            "Просим ознакомиться командами которые расположены ниже: \n\n" +
+            "Напишите /start для перезагрузки бота в случае каких то ошибок\n\n" +
+            "Нажмите Услуги для просмотра всех категории\n\n" +
+            "Нажмите Мои работы для просмотра фото моих работ\n\n" +
+            "Нажмите Связаться с барбером для просмотра адреса и моего номера\n\n" +
+            "Нажмите Активные записи для просмотра всех ваших активных записей\n\n" +
+            "Нажмите /help для просмотра этого сообщения обратно";
 
     @Override
     public List<Message> apply(Update update) {

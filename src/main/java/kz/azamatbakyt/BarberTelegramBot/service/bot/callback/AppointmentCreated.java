@@ -43,7 +43,7 @@ public class AppointmentCreated implements CallbackHandler{
 
         appointmentService.updateAppointmnetByStatus(Long.valueOf(chatId), Status.TIMESLOT_SELECTED, Status.BOOKING_SUCCESSFUL);
 
-        List<Appointment> activeAppointments = appointmentService.getActiveAppointments(Long.valueOf(chatId));
+        List<Appointment> activeAppointments = appointmentService.getActiveAppointments(Long.valueOf(chatId), Status.BOOKING_SUCCESSFUL);
         List<AppointmentTimeslot> appointmentTimeslots = appointmentTimeslotService.getAllByIdIn(
                 activeAppointments.stream().map(Appointment::getId).collect(Collectors.toList())
         );

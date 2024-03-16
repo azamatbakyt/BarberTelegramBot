@@ -7,18 +7,17 @@ import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class AppointmentTimeslotService {
 
     private final AppointmentTimeslotRepository appointmentTimeslotRepository;
-    private final TimeslotService timeslotService;
 
     @Autowired
-    public AppointmentTimeslotService(AppointmentTimeslotRepository appointmentTimeslotRepository, TimeslotService timeslotService) {
+    public AppointmentTimeslotService(AppointmentTimeslotRepository appointmentTimeslotRepository) {
         this.appointmentTimeslotRepository = appointmentTimeslotRepository;
-        this.timeslotService = timeslotService;
     }
 
     public List<AppointmentTimeslot> getAll() {
@@ -29,9 +28,6 @@ public class AppointmentTimeslotService {
         appointmentTimeslotRepository.saveAll(appointmentTimeslotList);
     }
 
-    public AppointmentTimeslot getAppointmentTimeslot(Appointment appointment) {
-        return appointmentTimeslotRepository.findAppointmentTimeslotByAppointmentId(appointment.getId());
-    }
 
 
     public List<AppointmentTimeslot> getListAT(Long id) {
@@ -68,16 +64,16 @@ public class AppointmentTimeslotService {
 
     }
 
-    public List<AppointmentTimeslot> getAllActiveBookings(Long chatId) {
-        return appointmentTimeslotRepository.findAllByChatId(chatId);
-    }
-
     public AppointmentTimeslot getAllById(Long id) {
         return appointmentTimeslotRepository.findAllById(id);
     }
 
     public List<AppointmentTimeslot> getAllByIdIn(List<Long> ids) {
         return appointmentTimeslotRepository.findAllByAppointmentIdIn(ids);
+    }
+
+    public List<AppointmentTimeslot> getAllByDate(LocalDate date){
+        return appointmentTimeslotRepository.findAllByDateOfBooking(date);
     }
 
 }

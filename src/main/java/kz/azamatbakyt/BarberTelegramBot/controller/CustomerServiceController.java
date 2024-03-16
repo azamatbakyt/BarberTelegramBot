@@ -32,11 +32,6 @@ public class CustomerServiceController {
         return "customerService/list";
     }
 
-    @GetMapping("/{id}")
-    public String getById(@PathVariable("id") Long id, Model model) {
-        model.addAttribute("service", csService.getServiceById(id));
-        return "customerService/card";
-    }
 
     @GetMapping("/new")
     public String getServiceForm(Model model) {

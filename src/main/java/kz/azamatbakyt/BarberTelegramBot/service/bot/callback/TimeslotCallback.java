@@ -28,7 +28,7 @@ import java.util.List;
 @Component
 public class TimeslotCallback implements CallbackHandler {
 
-    private final static String empty = "К сожалению на сегодня свободных таймслотов нету!";
+    private final static String empty = "К сожалению на эту дату свободных таймслотов нету!";
 
     private final static String text = "Отлично! Вы выбрали дату %s" +
             ". \nА давайте теперь выберем свободное для вас время.";

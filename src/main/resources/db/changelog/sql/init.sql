@@ -58,6 +58,7 @@ create table if not exists custom_schedule
     id bigserial primary key,
     custom_date DATE,
     timeslot_id bigint references timeslot(id) on delete cascade,
+    day_off boolean default false,
     unique(custom_date, timeslot_id)
     );
 

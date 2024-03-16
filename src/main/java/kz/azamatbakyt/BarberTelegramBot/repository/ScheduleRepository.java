@@ -9,8 +9,6 @@ import java.util.List;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
-    // TODO
-
     @Query(
             nativeQuery = true,
             value = "select * from schedule where day_of_week = ?"

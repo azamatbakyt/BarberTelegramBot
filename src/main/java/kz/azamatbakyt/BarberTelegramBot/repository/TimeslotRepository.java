@@ -12,11 +12,4 @@ public interface TimeslotRepository extends JpaRepository<Timeslot, Long> {
 
     List<Timeslot> findAllByStartTimeIn(List<LocalTime> times);
 
-    @Query(nativeQuery = true,
-            value = "select timeslot.* from timeslot " +
-                    "join appointment_timeslot on timeslot.id = appointment_timeslot.timeslot_id " +
-                    "join appointment on appointment_timeslot.appointment_id = appointment.id " +
-                    "join client on appointment.client_id = client.id " +
-                    "where appointment.status='BOOKING_SUCCESSFUL' and chat_id = ?")
-    List<Timeslot> findAllActiveTimeslots(Long chatId);
 }
