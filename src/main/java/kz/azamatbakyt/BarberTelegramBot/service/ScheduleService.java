@@ -10,9 +10,7 @@ import kz.azamatbakyt.BarberTelegramBot.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +41,7 @@ public class ScheduleService {
 
         LocalDate currentDate = LocalDate.now();
         // Вы можете заменить этот цикл вашим собственным механизмом генерации дат на 14 дней вперед, если это необходимо
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i <= 14; i++) {
             LocalDate day = currentDate.plusDays(i);
             List<CustomSchedule> customSchedules = customScheduleRepository.findCustomScheduleByCustomDate(day);
             List<Timeslot> timeslots = appointmentService.getTimeslotsForNonAvailableDay(day);
@@ -62,8 +60,14 @@ public class ScheduleService {
         return nonDayOffDates
                 .stream()
                 .filter(day -> {
-                    if (LocalDate.now().equals(day)){
-                        return LocalTime.now().isBefore(LocalTime.of(21, 0, 0));
+                    if (LocalDateTime.now()
+                            .atZone(ZoneId.of("Asia/Oral"))
+                            .toLocalDate()
+                            .equals(day)){
+                        return LocalDateTime.now()
+                                .atZone(ZoneId.of("Asia/Oral"))
+                                .toLocalTime()
+                                .isBefore(LocalTime.of(21, 0, 0));
                     }
 
                     return true;

@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class GetDaysCallback implements CallbackHandler{
@@ -77,12 +78,12 @@ public class GetDaysCallback implements CallbackHandler{
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<LocalDate> days = scheduleService.getDays();
-
+        Locale locale_ru = new Locale("ru", "RU");
         // Создаем кнопки для каждого дня
         List<InlineKeyboardButton> currentRow = new ArrayList<>();
         for (LocalDate day : days) {
             InlineKeyboardButton button = new InlineKeyboardButton();
-            String formattedDay = day.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+            String formattedDay = day.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru));
             button.setText(formattedDay);
             String callback = JsonHandler.toJson(List.of(CallbackType.DATE, day.toString()));
             button.setCallbackData(callback);

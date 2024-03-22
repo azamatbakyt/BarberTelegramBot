@@ -11,9 +11,7 @@ import kz.azamatbakyt.BarberTelegramBot.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,6 +54,8 @@ public class AppointmentService {
             LocalDate date,
             CustomerService service
     ) {
+
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
         final var allTimeslots = getTimeslotsOnDate(date);
         final var bookedTimeslots = getBookedTimeslotsOnDate(date);
 
@@ -86,8 +86,14 @@ public class AppointmentService {
 
         return availableTimeslots.stream()
                 .filter(timeslot -> {
-                            if (LocalDate.now().equals(date)) {
-                                return LocalTime.now().isBefore(timeslot.getStartTime());
+                            if ((LocalDateTime.now()
+                                            .atZone(ZoneId.of("Asia/Oral"))
+                                            .toLocalDate())
+                                            .equals(date)) {
+                                return LocalDateTime.now()
+                                        .atZone(ZoneId.of("Asia/Oral"))
+                                        .toLocalTime()
+                                        .isBefore(timeslot.getStartTime());
                             }
                             return true;
                         }
@@ -112,7 +118,7 @@ public class AppointmentService {
                 .map(CustomSchedule::getTimeslot)
                 .collect(Collectors.toList());
         if (timeslots.isEmpty()) {
-            return scheduleRepository.findScheduleByDayOfWeek(String.valueOf(date.getDayOfWeek().getValue()))
+            return scheduleRepository.findScheduleByDayOfWeek(date.getDayOfWeek().toString())
                     .stream().map(Schedule::getTimeslot)
                     .collect(Collectors.toList());
         } else {
