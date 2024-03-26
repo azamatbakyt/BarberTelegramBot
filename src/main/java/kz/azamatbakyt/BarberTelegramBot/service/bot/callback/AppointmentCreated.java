@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ public class AppointmentCreated implements CallbackHandler{
         messageText.setMessageId(messageId);
 
         appointmentService.updateAppointmnetByStatus(Long.valueOf(chatId), Status.TIMESLOT_SELECTED, Status.BOOKING_SUCCESSFUL);
-
+        Locale locale_ru = new Locale("ru", "RU");
         List<Appointment> activeAppointments = appointmentService.getActiveAppointments(Long.valueOf(chatId), Status.BOOKING_SUCCESSFUL);
         List<AppointmentTimeslot> appointmentTimeslots = appointmentTimeslotService.getAllByIdIn(
                 activeAppointments.stream().map(Appointment::getId).collect(Collectors.toList())
@@ -56,7 +57,7 @@ public class AppointmentCreated implements CallbackHandler{
                     .append("Услуга: ").append(appointment.getService().getName()).append("\n")
                     .append("Цена: ").append(appointment.getService().getPrice()).append(" тг\n")
                     .append("Длительность: ").append(appointment.getService().getDuration()).append(" мин\n")
-                    .append("Дата: ").append(appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))).append(" года").append("\n")
+                    .append("Дата: ").append(appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru))).append(" года").append("\n")
                     .append("Время: ");
 
             appointmentTimeslots.stream()

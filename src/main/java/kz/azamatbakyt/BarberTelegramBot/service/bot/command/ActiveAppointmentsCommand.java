@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Component
@@ -38,6 +39,7 @@ public class ActiveAppointmentsCommand implements Command {
         List<AppointmentTimeslot> appointmentTimeslots = appointmentTimeslotRepository.findAllByAppointmentIdIn(
                 appointments.stream().map(Appointment::getId).collect(Collectors.toList())
         );
+        Locale locale_ru = new Locale("ru", "RU");
         StringBuilder msg = new StringBuilder();
         msg.append("Ваши активные записи: ").append("\n\n");
         for (int i = 0; i < appointments.size(); i++) {
@@ -47,7 +49,7 @@ public class ActiveAppointmentsCommand implements Command {
                     .append("Услуга: ").append(appointment.getService().getName()).append("\n")
                     .append("Цена: ").append(appointment.getService().getPrice()).append(" тг\n")
                     .append("Длительность: ").append(appointment.getService().getDuration()).append(" мин\n")
-                    .append("Дата: ").append(appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy"))).append(" года").append("\n")
+                    .append("Дата: ").append(appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru))).append(" года").append("\n")
                     .append("Время: ");
 
             appointmentTimeslots.stream()

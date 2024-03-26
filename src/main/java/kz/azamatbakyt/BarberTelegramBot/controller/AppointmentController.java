@@ -9,8 +9,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.exceptions.TemplateProcessingException;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/appointments")
@@ -36,16 +40,26 @@ public class AppointmentController {
 
     @GetMapping
     public String getAppointments(Model model) {
+        Locale locale_ru = new Locale("ru", "RU");
         model.addAttribute("appointments", appointmentTimeslotService.getAll());
-        model.addAttribute("getDays", scheduleService.getDays());
+        model.addAttribute("getDays", scheduleService.getDays()
+                .stream()
+                .map(date -> date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru)))
+                .collect(Collectors.toList())
+        );
         model.addAttribute("showAllAppointments", true);
         return "appointments/list";
     }
 
     @GetMapping("/bydate")
     public String getAppointmentsByDate(Model model, @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
+        Locale locale_ru = new Locale("ru", "RU");
         model.addAttribute("appointmentByDate", appointmentTimeslotService.getAllByDate(date));
-        model.addAttribute("getDays", scheduleService.getDays());
+        model.addAttribute("getDays", scheduleService.getDays()
+                .stream()
+                .map(day -> day.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru)))
+                .collect(Collectors.toList())
+        );
         model.addAttribute("showAllAppointments", false);
         return "appointments/list";
     }
@@ -99,5 +113,10 @@ public class AppointmentController {
         appointmentService.delete(id);
 
         return "redirect:/appointments";
+    }
+
+    @ExceptionHandler(TemplateProcessingException.class)
+    public String errorPage(){
+        return "error";
     }
 }

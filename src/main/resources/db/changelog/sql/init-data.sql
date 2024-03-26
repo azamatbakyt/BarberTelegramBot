@@ -27,3 +27,7 @@ VALUES ((select id from role where role_name = 'ROLE_ADMIN'), 'azamat', '$2a$10$
 
 INSERT INTO users(role_id, username, password,phone_number)
 VALUES ((select id from role where role_name = 'ROLE_USER'), 'azema', '$2a$10$wOk2EvzLK9ax4hLalLKjVegvW0HgWsDX25i/8cL0Td0OZE4OxrcmW', '054898');
+
+INSERT INTO users(role_id, username, password,phone_number)
+VALUES ((select id from role where role_name = 'ROLE_ADMIN'), 'belyyniger', '$2a$10$PIuRHuGGE.SQI7sEB20zLeWuBmobnKne8E/6Xqxi084X6gWL6wmgK', '8(747)917-73-66');
+
