@@ -9,6 +9,8 @@ import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository
 import kz.azamatbakyt.BarberTelegramBot.repository.CustomScheduleRepository;
 import kz.azamatbakyt.BarberTelegramBot.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
