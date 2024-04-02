@@ -2,6 +2,7 @@ package kz.azamatbakyt.BarberTelegramBot.controller;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,29 +46,16 @@ public class AppointmentController {
     @GetMapping
     public String getAppointments(Model model) {
         Locale locale_ru = new Locale("ru", "RU");
-        model.addAttribute("appointments", appointmentTimeslotService.getAll());
-        model.addAttribute("getDays", scheduleService.getDays()
-                .stream()
-                .map(date -> date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru)))
-                .collect(Collectors.toList())
-        );
+        model.addAttribute("appointments", appointmentTimeslotService.getAllSuccessfulAppointments(Status.BOOKING_SUCCESSFUL));
+        model.addAttribute("getDays", scheduleService.getDays());
         model.addAttribute("showAllAppointments", true);
         return "appointments/list";
     }
 
     @GetMapping("/bydate")
-    public String getAppointmentsByDate(Model model, @RequestParam("date")String date) throws ParseException {
-        SimpleDateFormat format = new SimpleDateFormat();
-        format.applyPattern("dd MMMM yyyy");
-        Locale locale_ru = new Locale("ru", "RU");
-        Date utilDate = format.parse(date);
-        LocalDate parsedDate = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        model.addAttribute("appointmentByDate", appointmentTimeslotService.getAllByDate(parsedDate));
-        model.addAttribute("getDays", scheduleService.getDays()
-                .stream()
-                .map(day -> day.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru)))
-                .collect(Collectors.toList())
-        );
+    public String getAppointmentsByDate(Model model, @RequestParam("date")LocalDate date) throws ParseException {
+        model.addAttribute("appointmentByDate", appointmentTimeslotService.getAllByDate(date));
+        model.addAttribute("getDays", scheduleService.getDays());
         model.addAttribute("showAllAppointments", false);
         return "appointments/list";
     }

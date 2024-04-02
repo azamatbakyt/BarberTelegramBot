@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 public class TimeslotCallback implements CallbackHandler {
@@ -59,7 +60,8 @@ public class TimeslotCallback implements CallbackHandler {
             message.setReplyMarkup(restart());
             return sendMessage(message);
         }
-        String formattedDay = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy"));
+        Locale locale_ru = new Locale("ru", "RU");
+        String formattedDay = date.format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru));
         Appointment appointment = appointmentService.updateDateOfBookingByChatId(
                 Long.valueOf(chatId),
                 date,

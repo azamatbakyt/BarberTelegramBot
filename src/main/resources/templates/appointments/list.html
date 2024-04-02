@@ -83,6 +83,29 @@
             padding: 5px 10px;
             font-size: 14px;
         }
+
+        .custom-button {
+            /* Общие стили для кнопок */
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: gray;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .custom-button:hover {
+            /* Стили при наведении */
+            background-color: dimgray;
+        }
+
+        .custom-button a {
+            /* Стили для ссылки внутри кнопки */
+            color: #fff;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -125,7 +148,10 @@
                 <option th:each="day : ${getDays}" th:value="${day}" th:text="${day}"></option>
             </select>
         </div>
-        <input type="submit" value="Показать записи">
+        <input type="submit" value="Показать записи" class="custom-button">
+        <button class="custom-button"><a th:href="@{/appointments}">Сбросить</a></button>
+
+
 
         <table class="table table-bordered">
             <thead class="table-dark">
@@ -133,7 +159,7 @@
                 <th scope="col">Id</th>
                 <th scope="col">Клиент</th>
                 <th scope="col">Услуга</th>
-                <th scope="col">Время:</th>
+                <th scope="col">Время</th>
                 <th scope="col">Дата</th>
             </tr>
             </thead>

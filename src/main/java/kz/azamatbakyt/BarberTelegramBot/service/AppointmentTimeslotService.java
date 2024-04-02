@@ -3,6 +3,7 @@ package kz.azamatbakyt.BarberTelegramBot.service;
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.AppointmentTimeslot;
 import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,10 @@ public class AppointmentTimeslotService {
 
     public List<AppointmentTimeslot> getAll() {
         return appointmentTimeslotRepository.findAll();
+    }
+
+    public List<AppointmentTimeslot> getAllSuccessfulAppointments(Status status){
+        return appointmentTimeslotRepository.findAllSuccessfulAppointments(status.toString());
     }
 
     public void save(List<AppointmentTimeslot> appointmentTimeslotList) {
