@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +38,13 @@ public class ActiveAppointmentsCommand implements Command {
         long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
-        List<Appointment> appointments = appointmentService.getActiveAppointments(chatId, Status.BOOKING_SUCCESSFUL);
+        List<Appointment> appointments = appointmentService.getActiveAppointments(chatId, Status.BOOKING_SUCCESSFUL)
+                .stream()
+                .filter(appointment -> appointment.getDateOfBooking().isAfter(LocalDateTime.now()
+                        .atZone(ZoneId.of("Asia/Almaty"))
+                        .toLocalDate()
+                ))
+                .collect(Collectors.toList());
         List<AppointmentTimeslot> appointmentTimeslots = appointmentTimeslotRepository.findAllByAppointmentIdIn(
                 appointments.stream().map(Appointment::getId).collect(Collectors.toList())
         );

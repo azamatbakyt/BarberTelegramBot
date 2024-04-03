@@ -14,7 +14,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -44,7 +46,12 @@ public class AppointmentCreated implements CallbackHandler{
 
         appointmentService.updateAppointmnetByStatus(Long.valueOf(chatId), Status.TIMESLOT_SELECTED, Status.BOOKING_SUCCESSFUL);
         Locale locale_ru = new Locale("ru", "RU");
-        List<Appointment> activeAppointments = appointmentService.getActiveAppointments(Long.valueOf(chatId), Status.BOOKING_SUCCESSFUL);
+        List<Appointment> activeAppointments = appointmentService.getActiveAppointments(Long.valueOf(chatId), Status.BOOKING_SUCCESSFUL)
+                .stream()
+                .filter(appointment -> appointment.getDateOfBooking().isAfter(LocalDateTime.now()
+                        .atZone(ZoneId.of("Asia/Almaty"))
+                        .toLocalDate()))
+                .collect(Collectors.toList());
         List<AppointmentTimeslot> appointmentTimeslots = appointmentTimeslotService.getAllByIdIn(
                 activeAppointments.stream().map(Appointment::getId).collect(Collectors.toList())
         );

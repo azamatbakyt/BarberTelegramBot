@@ -41,6 +41,10 @@ public class TelegramUtils {
         row.add(CommandType.CONTACT_BARBER.getCommandText());
         rows.add(row);
 
+        row = new KeyboardRow();
+        row.add(CommandType.MANAGE_APPOINTMENTS.getCommandText());
+        rows.add(row);
+
         keyboard.setKeyboard(rows);
 
         return keyboard;

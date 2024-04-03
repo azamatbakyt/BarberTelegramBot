@@ -61,11 +61,11 @@ public class ScheduleService {
                 .stream()
                 .filter(day -> {
                     if (LocalDateTime.now()
-                            .atZone(ZoneId.of("Asia/Oral"))
+                            .atZone(ZoneId.of("Asia/Almaty"))
                             .toLocalDate()
                             .equals(day)){
                         return LocalDateTime.now()
-                                .atZone(ZoneId.of("Asia/Oral"))
+                                .atZone(ZoneId.of("Asia/Almaty"))
                                 .toLocalTime()
                                 .isBefore(LocalTime.of(21, 0, 0));
                     }

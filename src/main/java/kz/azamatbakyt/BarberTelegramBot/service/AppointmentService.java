@@ -89,11 +89,11 @@ public class AppointmentService {
         return availableTimeslots.stream()
                 .filter(timeslot -> {
                             if ((LocalDateTime.now()
-                                            .atZone(ZoneId.of("Asia/Oral"))
+                                            .atZone(ZoneId.of("Asia/Almaty"))
                                             .toLocalDate())
                                             .equals(date)) {
                                 return LocalDateTime.now()
-                                        .atZone(ZoneId.of("Asia/Oral"))
+                                        .atZone(ZoneId.of("Asia/Almaty"))
                                         .toLocalTime()
                                         .isBefore(timeslot.getStartTime());
                             }
