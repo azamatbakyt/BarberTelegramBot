@@ -54,9 +54,9 @@ public class AppointmentManagementCallback implements CallbackHandler{
         }
         builder.append("Ниже представлена информация о записи:").append("\n")
                 .append("Услуга: ").append(appointments.get(0).getAppointment().getService().getName()).append("\n")
-                .append("Дата: ").append(appointments.get(0).getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru))).append("\n")
+                .append("Дата: ").append(appointments.get(0).getAppointment().getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru))).append(" года").append("\n")
                 .append("Длительность: ").append(appointments.get(0).getAppointment().getService().getDuration()).append(" мин").append("\n")
-                .append("Время: ").append("\n").append(appointments.get(0).getTimeslot().getStartTime()).append(" - ").append(appointments.get(0).getTimeslot().getEndTime()).append("\n")
+                .append("Время: ").append(appointments.get(0).getTimeslot().getStartTime()).append(" - ").append(appointments.get(0).getTimeslot().getEndTime()).append("\n")
                 .append("Цена: ").append(appointments.get(0).getAppointment().getService().getPrice()).append("тг").append("\n").append("\n")
                 .append("Ваши действия:");
 

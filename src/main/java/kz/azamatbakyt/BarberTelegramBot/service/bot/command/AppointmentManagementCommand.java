@@ -47,27 +47,32 @@ public class AppointmentManagementCommand implements Command{
         return build(sendMessage);
     }
 
-    private InlineKeyboardMarkup appointmentList(Long chatId){
+    private InlineKeyboardMarkup appointmentList(Long chatId) {
         List<Appointment> appointments = appointmentService.getActiveAppointments(chatId, Status.BOOKING_SUCCESSFUL)
                 .stream()
                 .filter(appointment -> appointment.getDateOfBooking().isAfter(LocalDateTime.now()
                         .atZone(ZoneId.of("Asia/Almaty"))
                         .toLocalDate()))
                 .collect(Collectors.toList());
+
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
-        List<InlineKeyboardButton> buttons = new ArrayList<>();
+
         for (Appointment appointment : appointments) {
             Locale locale_ru = new Locale("ru", "RU");
             InlineKeyboardButton btn = new InlineKeyboardButton();
             btn.setText(String.valueOf(appointment.getDateOfBooking().format(DateTimeFormatter.ofPattern("dd MMMM yyyy", locale_ru))));
             String callback = JsonHandler.toJson(List.of(CallbackType.APPOINTMENT_ID, String.valueOf(appointment.getId())));
             btn.setCallbackData(callback);
+
+
+            List<InlineKeyboardButton> buttons = new ArrayList<>();
             buttons.add(btn);
+            rowsInLine.add(buttons); 
         }
 
-        rowsInLine.add(buttons);
         markup.setKeyboard(rowsInLine);
         return markup;
     }
+
 }
