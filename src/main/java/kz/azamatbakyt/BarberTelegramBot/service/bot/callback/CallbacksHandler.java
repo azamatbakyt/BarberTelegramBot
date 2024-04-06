@@ -34,7 +34,8 @@ public class CallbacksHandler {
             EmptyTimeslotCallback emptyTimeslotCallback,
             AppointmentManagementCallback appointmentManagementCallback,
             AppointmentDeletedCallback appointmentDeletedCallback,
-            NotFinishedAppointmentDeletedCallback notFinishedAppointmentDeletedCallback
+            NotFinishedAppointmentDeletedCallback notFinishedAppointmentDeletedCallback,
+            DeleteMyDataCallback deleteMyDataCallback
     ) {
         this.callbacks = Map.ofEntries(
                 entry(CallbackType.SERVICES, servicesCallback),
@@ -51,7 +52,9 @@ public class CallbacksHandler {
                 entry(CallbackType.EMPTY_TIMESLOTS, emptyTimeslotCallback),
                 entry(CallbackType.APPOINTMENT_ID, appointmentManagementCallback),
                 entry(CallbackType.ACTIVE_APPOINTMENT_DELETED, appointmentDeletedCallback),
-                entry(CallbackType.DELETE_NOT_FINISHED_APPOINTMENT, notFinishedAppointmentDeletedCallback)
+                entry(CallbackType.DELETE_NOT_FINISHED_APPOINTMENT, notFinishedAppointmentDeletedCallback),
+                entry(CallbackType.DELETE_MY_DATA, deleteMyDataCallback)
+
         );
     }
 

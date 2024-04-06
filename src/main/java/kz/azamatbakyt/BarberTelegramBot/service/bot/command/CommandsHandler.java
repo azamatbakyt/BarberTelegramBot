@@ -23,16 +23,19 @@ public class CommandsHandler {
                            ActiveAppointmentsCommand activeAppointmentsCommand,
                            ContactBarberCommand contactBarberCommand,
                            AppointmentManagementCommand appointmentManagementCommand,
-                           NotFinishedAppointmentCommand notFinishedAppointmentCommand) {
+                           NotFinishedAppointmentCommand notFinishedAppointmentCommand,
+                           HiddenKeyboardCommand hiddenKeyboardCommand
+    ) {
         this.commands = Map.of(
                 CommandType.START, startCommand,
                 CommandType.SERVICE_GROUP, servicesGroupsCommand,
-                CommandType.HELP,  helpCommand,
+                CommandType.HELP, helpCommand,
                 CommandType.PORTFOLIO, portfolioCommand,
                 CommandType.ACTIVE_APPOINTMENTS, activeAppointmentsCommand,
                 CommandType.CONTACT_BARBER, contactBarberCommand,
                 CommandType.MANAGE_APPOINTMENTS, appointmentManagementCommand,
-                CommandType.NOT_FINISHED_APPOINTEMNT_COMMAND, notFinishedAppointmentCommand
+                CommandType.NOT_FINISHED_APPOINTEMNT_COMMAND, notFinishedAppointmentCommand,
+                CommandType.KEYBOARD_HIDE, hiddenKeyboardCommand
         );
     }
 

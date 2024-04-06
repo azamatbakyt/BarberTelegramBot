@@ -9,7 +9,8 @@ public enum CommandType {
     ACTIVE_APPOINTMENTS("Мои активные записи"),
     CONTACT_BARBER("Связаться с барбером"),
     MANAGE_APPOINTMENTS("Управление бронированием"),
-    NOT_FINISHED_APPOINTEMNT_COMMAND("Незавершенные бронирования")
+    NOT_FINISHED_APPOINTEMNT_COMMAND("Незавершенные бронирования"),
+    KEYBOARD_HIDE("/keyboard")
     ;
 
 

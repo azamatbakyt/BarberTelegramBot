@@ -131,7 +131,7 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
         List<BotCommand> menu = new ArrayList<>();
         menu.add(new BotCommand("/start", "Перезапустить бота"));
         menu.add(new BotCommand("/help", "Помощь"));
-
+        menu.add(new BotCommand("/keyboard", "Исчезла клавиатура?"));
         try{
             execute(new SetMyCommands(menu, new BotCommandScopeDefault(), null));
         } catch(TelegramApiException e){

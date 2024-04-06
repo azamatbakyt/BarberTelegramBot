@@ -47,12 +47,16 @@ public class AppointmentManagementCommand implements Command{
                 .collect(Collectors.toList());
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        if (!appointments.isEmpty()) {
-            sendMessage.setText(MANAGEMENT);
-            sendMessage.setReplyMarkup(appointmentList(appointments));
-        }
+        if (appointments.isEmpty()) {
+            SendMessage message = new SendMessage();
+            message.setChatId(chatId);
+            message.setText("К сожалению на данный момент у вас нету активных записей");
 
-        sendMessage.setText("К сожалению на данный момент у вас нету активных записей");
+            return build(message);
+        }
+        sendMessage.setText(MANAGEMENT);
+        sendMessage.setReplyMarkup(appointmentList(appointments));
+
         return build(sendMessage);
     }
 

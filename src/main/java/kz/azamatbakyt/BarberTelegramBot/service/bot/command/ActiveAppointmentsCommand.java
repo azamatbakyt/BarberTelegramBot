@@ -73,10 +73,14 @@ public class ActiveAppointmentsCommand implements Command {
             msg.append("\n\n");
         }
         msg.append("До скорой встречи!");
-        if (!appointments.isEmpty())
-            message.setText(msg.toString());
+        message.setText(msg.toString());
+        if (appointments.isEmpty()) {
+            SendMessage sendMessage = new SendMessage();
+            sendMessage.setChatId(String.valueOf(chatId));
+            sendMessage.setText("К сожалению на данный момент у вас нету активных записей");
+            return build(sendMessage);
+        }
 
-        message.setText("К сожалению на данный момент у вас нету активных записей");
         return build(message);
     }
 }
