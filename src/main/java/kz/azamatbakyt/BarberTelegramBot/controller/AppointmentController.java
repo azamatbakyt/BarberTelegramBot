@@ -3,21 +3,17 @@ package kz.azamatbakyt.BarberTelegramBot.controller;
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.Timeslot;
 import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
-import kz.azamatbakyt.BarberTelegramBot.repository.AppointmentTimeslotRepository;
 import kz.azamatbakyt.BarberTelegramBot.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -31,6 +27,7 @@ public class AppointmentController {
     private final CSService csService;
     private final ScheduleService scheduleService;
     private final AppointmentTimeslotService appointmentTimeslotService;
+
     @Autowired
     public AppointmentController(AppointmentService appointmentService, TimeslotService timeslotService,
                                  ClientService clientService, CSService csService, ScheduleService scheduleService, AppointmentTimeslotService appointmentTimeslotService) {
@@ -46,14 +43,20 @@ public class AppointmentController {
     @GetMapping
     public String getAppointments(Model model) {
         Locale locale_ru = new Locale("ru", "RU");
-        model.addAttribute("appointments", appointmentTimeslotService.getAllSuccessfulAppointments(Status.BOOKING_SUCCESSFUL));
+        model.addAttribute("appointments", appointmentTimeslotService.getAllSuccessfulAppointments(Status.BOOKING_SUCCESSFUL)
+                .stream()
+                .filter(appointmentTimeslot -> appointmentTimeslot.getAppointment().getDateOfBooking().isAfter(LocalDateTime.now()
+                        .atZone(ZoneId.of("Asia/Almaty"))
+                        .toLocalDate().minusDays(1)) )
+                .collect(Collectors.toList())
+        );
         model.addAttribute("getDays", scheduleService.getDays());
         model.addAttribute("showAllAppointments", true);
         return "appointments/list";
     }
 
     @GetMapping("/bydate")
-    public String getAppointmentsByDate(Model model, @RequestParam("date")LocalDate date) throws ParseException {
+    public String getAppointmentsByDate(Model model, @RequestParam("date") LocalDate date) throws ParseException {
         model.addAttribute("appointmentByDate", appointmentTimeslotService.getAllByDate(date));
         model.addAttribute("getDays", scheduleService.getDays());
         model.addAttribute("showAllAppointments", false);
@@ -112,7 +115,7 @@ public class AppointmentController {
     }
 
     @ExceptionHandler(TemplateProcessingException.class)
-    public String errorPage(){
+    public String errorPage() {
         return "error";
     }
 }

@@ -34,5 +34,12 @@ public interface AppointmentTimeslotRepository extends JpaRepository<Appointment
     value = "select appointment_timeslot.* from appointment_timeslot " +
             "where appointment_timeslot.appointment_id=?")
     AppointmentTimeslot findByAppointmentId(Long id);
+
+    @Query(nativeQuery = true,
+    value = "select appointment_timeslot.* from appointment_timeslot " +
+            "left join appointment on appointment_timeslot.appointment_id = appointment.id " +
+            "left join client on client.id = appointment.client_id " +
+            "where client.chat_id=? and appointment.status=?")
+    List<AppointmentTimeslot> findAllByStatus(Long id, String status);
 }
 

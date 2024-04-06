@@ -85,4 +85,9 @@ public class AppointmentTimeslotService {
         return appointmentTimeslotRepository.findByAppointmentId(id);
     }
 
+    public List<AppointmentTimeslot> getAppointmentByChatIdAndStatus(Long chatId, Status status){
+        return appointmentTimeslotRepository.findAllByStatus(chatId, status.toString());
+    }
+
+
 }

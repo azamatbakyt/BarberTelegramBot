@@ -43,7 +43,8 @@ public class AppointmentManagementCommand implements Command{
                 .stream()
                 .filter(appointment -> appointment.getDateOfBooking().isAfter(LocalDateTime.now()
                         .atZone(ZoneId.of("Asia/Almaty"))
-                        .toLocalDate()))
+                        .toLocalDate()
+                        .minusDays(1)))
                 .collect(Collectors.toList());
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);

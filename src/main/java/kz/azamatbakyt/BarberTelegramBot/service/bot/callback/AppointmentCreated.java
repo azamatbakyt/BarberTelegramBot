@@ -50,7 +50,8 @@ public class AppointmentCreated implements CallbackHandler{
                 .stream()
                 .filter(appointment -> appointment.getDateOfBooking().isAfter(LocalDateTime.now()
                         .atZone(ZoneId.of("Asia/Almaty"))
-                        .toLocalDate()))
+                        .toLocalDate()
+                        .minusDays(1)))
                 .collect(Collectors.toList());
         List<AppointmentTimeslot> appointmentTimeslots = appointmentTimeslotService.getAllByIdIn(
                 activeAppointments.stream().map(Appointment::getId).collect(Collectors.toList())

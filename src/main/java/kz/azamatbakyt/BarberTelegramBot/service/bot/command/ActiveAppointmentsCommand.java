@@ -43,6 +43,7 @@ public class ActiveAppointmentsCommand implements Command {
                 .filter(appointment -> appointment.getDateOfBooking().isAfter(LocalDateTime.now()
                         .atZone(ZoneId.of("Asia/Almaty"))
                         .toLocalDate()
+                        .minusDays(1)
                 ))
                 .collect(Collectors.toList());
         List<AppointmentTimeslot> appointmentTimeslots = appointmentTimeslotRepository.findAllByAppointmentIdIn(
