@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class ContactBarberCommand implements Command{
 
-    private final static String BARBER_PHONE_NUMBER = "Номер телефона: +7(747) 917-73-66\nАдрес: https://go.2gis.com/txowv";
+    private final static String BARBER_PHONE_NUMBER = "Номер телефона: +7 776 777 8611\nАдрес: https://go.2gis.com/txowv";
 
     @Override
     public List<Message> apply(Update update) {

@@ -1,5 +1,6 @@
 package kz.azamatbakyt.BarberTelegramBot.repository;
 
+import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
 import kz.azamatbakyt.BarberTelegramBot.entity.AppointmentTimeslot;
 import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,5 +29,10 @@ public interface AppointmentTimeslotRepository extends JpaRepository<Appointment
             "left join appointment on appointment_timeslot.appointment_id = appointment.id " +
             "where public.appointment.status=?")
     List<AppointmentTimeslot> findAllSuccessfulAppointments(String status);
+
+    @Query(nativeQuery = true,
+    value = "select appointment_timeslot.* from appointment_timeslot " +
+            "where appointment_timeslot.appointment_id=?")
+    AppointmentTimeslot findByAppointmentId(Long id);
 }
 

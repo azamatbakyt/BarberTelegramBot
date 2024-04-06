@@ -39,22 +39,24 @@ public class AppointmentManagementCommand implements Command{
     @Override
     public List<Message> apply(Update update) {
         String chatId = TelegramUtils.getStringChatId(update);
-        SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(MANAGEMENT);
-        sendMessage.setReplyMarkup(appointmentList(Long.valueOf(chatId)));
-
-        return build(sendMessage);
-    }
-
-    private InlineKeyboardMarkup appointmentList(Long chatId) {
-        List<Appointment> appointments = appointmentService.getActiveAppointments(chatId, Status.BOOKING_SUCCESSFUL)
+        List<Appointment> appointments = appointmentService.getActiveAppointments(Long.valueOf(chatId), Status.BOOKING_SUCCESSFUL)
                 .stream()
                 .filter(appointment -> appointment.getDateOfBooking().isAfter(LocalDateTime.now()
                         .atZone(ZoneId.of("Asia/Almaty"))
                         .toLocalDate()))
                 .collect(Collectors.toList());
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        if (!appointments.isEmpty()) {
+            sendMessage.setText(MANAGEMENT);
+            sendMessage.setReplyMarkup(appointmentList(appointments));
+        }
 
+        sendMessage.setText("К сожалению на данный момент у вас нету активных записей");
+        return build(sendMessage);
+    }
+
+    private InlineKeyboardMarkup appointmentList(List<Appointment> appointments) {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInLine = new ArrayList<>();
 

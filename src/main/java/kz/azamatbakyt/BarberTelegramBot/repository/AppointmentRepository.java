@@ -1,7 +1,6 @@
 package kz.azamatbakyt.BarberTelegramBot.repository;
 
 import kz.azamatbakyt.BarberTelegramBot.entity.Appointment;
-import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -42,4 +41,11 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             "where appointment.status=?;")
     Appointment findCanceledAppointmnet(String status);
 
+
+    @Query(nativeQuery = true,
+            value = "select appointment.* from appointment " +
+                    "left join client on appointment.client_id = client.id " +
+                    "where client.chat_id=? and appointment.status=? " +
+                    "or appointment.status=? or appointment.status=?")
+    List<Appointment> findNotFinishedAppointments(Long chatId, String status1, String status2, String status3);
 }

@@ -8,7 +8,8 @@ public enum CommandType {
     PORTFOLIO("Мои работы"),
     ACTIVE_APPOINTMENTS("Мои активные записи"),
     CONTACT_BARBER("Связаться с барбером"),
-    MANAGE_APPOINTMENTS("Управление бронированием")
+    MANAGE_APPOINTMENTS("Управление бронированием"),
+    NOT_FINISHED_APPOINTEMNT_COMMAND("Незавершенные бронирования")
     ;
 
 

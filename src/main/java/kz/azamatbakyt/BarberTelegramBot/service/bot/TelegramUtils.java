@@ -43,6 +43,7 @@ public class TelegramUtils {
 
         row = new KeyboardRow();
         row.add(CommandType.MANAGE_APPOINTMENTS.getCommandText());
+        row.add(CommandType.NOT_FINISHED_APPOINTEMNT_COMMAND.getCommandText());
         rows.add(row);
 
         keyboard.setKeyboard(rows);

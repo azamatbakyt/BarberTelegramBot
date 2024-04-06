@@ -81,4 +81,8 @@ public class AppointmentTimeslotService {
         return appointmentTimeslotRepository.findAllByDateOfBooking(date);
     }
 
+    public AppointmentTimeslot getByAppointmentId(Long id){
+        return appointmentTimeslotRepository.findByAppointmentId(id);
+    }
+
 }
