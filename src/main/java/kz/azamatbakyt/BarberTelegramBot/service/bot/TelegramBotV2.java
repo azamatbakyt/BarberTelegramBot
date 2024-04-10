@@ -166,7 +166,7 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
                 if (secondCondition) {
                     String textToSend = "Напоминаем что у вас сегодня в " + appointment.getTimeslot().getStartTime()
                             + " часов стоит запись на услугу " + appointment.getAppointment().getService().getName() + "!";
-                    reminderSender(appointment.getAppointment().getClient().getChatId(), textToSend);
+                    reminderSender(String.valueOf(appointment.getAppointment().getClient().getChatId()), textToSend);
                 }
             }
         }
