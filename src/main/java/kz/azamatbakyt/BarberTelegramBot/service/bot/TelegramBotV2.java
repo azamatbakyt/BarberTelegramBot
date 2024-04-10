@@ -2,25 +2,33 @@ package kz.azamatbakyt.BarberTelegramBot.service.bot;
 
 import jakarta.annotation.PostConstruct;
 import kz.azamatbakyt.BarberTelegramBot.config.BotConfig;
+import kz.azamatbakyt.BarberTelegramBot.entity.AppointmentTimeslot;
 import kz.azamatbakyt.BarberTelegramBot.entity.Client;
+import kz.azamatbakyt.BarberTelegramBot.helpers.Status;
+import kz.azamatbakyt.BarberTelegramBot.service.AppointmentTimeslotService;
 import kz.azamatbakyt.BarberTelegramBot.service.ClientService;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.callback.CallbacksHandler;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.command.CommandsHandler;
+import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import kz.azamatbakyt.BarberTelegramBot.service.bot.register.ClientRegistrationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
-import kz.azamatbakyt.BarberTelegramBot.service.bot.model.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,17 +46,19 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
     private final ClientService clientsService;
 
     private final ClientRegistrationHandler clientRegistrationHandler;
+    private final AppointmentTimeslotService appointmentTimeslotService;
 
     public TelegramBotV2(BotConfig botProperties,
                          CommandsHandler commandsHandler,
                          CallbacksHandler callbacksHandler,
                          ClientService clientsService,
-                         ClientRegistrationHandler clientRegistrationHandler) {
+                         ClientRegistrationHandler clientRegistrationHandler, AppointmentTimeslotService appointmentTimeslotService) {
         this.botProperties = botProperties;
         this.commandsHandler = commandsHandler;
         this.callbacksHandler = callbacksHandler;
         this.clientsService = clientsService;
         this.clientRegistrationHandler = clientRegistrationHandler;
+        this.appointmentTimeslotService = appointmentTimeslotService;
     }
 
     @Override
@@ -62,10 +72,8 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
     }
 
     /**
-     *
      * /start -
      * /other -
-     *
      *
      * @param update
      */
@@ -89,9 +97,12 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
     private void send(List<Message> messages) {
         for (Message msg : messages) {
             switch (msg.getMessageType()) {
-                case PHOTO: sendPhoto(msg.getSendPhoto());
-                case MESSAGE: sendMessage(msg.getSendMessage());
-                case EDIT_MESSAGE_TEXT: editMessageText(msg.getEditMessageText());
+                case PHOTO:
+                    sendPhoto(msg.getSendPhoto());
+                case MESSAGE:
+                    sendMessage(msg.getSendMessage());
+                case EDIT_MESSAGE_TEXT:
+                    editMessageText(msg.getEditMessageText());
             }
         }
     }
@@ -127,14 +138,48 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
 
 
     @PostConstruct
-    private void menu(){
+    private void menu() {
         List<BotCommand> menu = new ArrayList<>();
         menu.add(new BotCommand("/start", "Перезапустить бота"));
         menu.add(new BotCommand("/help", "Помощь"));
         menu.add(new BotCommand("/keyboard", "Исчезла клавиатура?"));
-        try{
+        try {
             execute(new SetMyCommands(menu, new BotCommandScopeDefault(), null));
-        } catch(TelegramApiException e){
+        } catch (TelegramApiException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Scheduled(cron = "${scheduler.cron}")
+    public void reminder() {
+        var appointments = appointmentTimeslotService.getAllSuccessfulAppointments(Status.BOOKING_SUCCESSFUL);
+        LocalTime currentTime = LocalDateTime.now()
+                .atZone(ZoneId.of("Asia/Almaty"))
+                .toLocalTime();
+        LocalDate currentDate = LocalDateTime.now()
+                .atZone(ZoneId.of("Asia/Almaty"))
+                .toLocalDate();
+        for (AppointmentTimeslot appointment : appointments) {
+            boolean firstCondition = appointment.getAppointment().getDateOfBooking().isEqual(currentDate);
+            boolean secondCondition = currentTime.getHour() == appointment.getTimeslot().getStartTime().minusHours(2).getHour();
+            if (firstCondition) {
+                if (secondCondition) {
+                    String textToSend = "Напоминаем что у вас сегодня в " + appointment.getTimeslot().getStartTime()
+                            + " часов стоит запись на услугу " + appointment.getAppointment().getService().getName() + "!";
+                    reminderSender(appointment.getAppointment().getClient().getChatId(), textToSend);
+                }
+            }
+        }
+
+    }
+
+    public void reminderSender(String chatId, String textToSend) {
+        SendMessage message = new SendMessage();
+        message.setChatId(chatId);
+        message.setText(chatId);
+        try {
+            execute(message);
+        } catch (TelegramApiException e) {
             System.out.println(e.getMessage());
         }
     }
