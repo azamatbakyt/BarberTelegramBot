@@ -42,7 +42,7 @@ public class Client {
         this.id = id;
     }
 
-    public String getChatId() {
+    public Long getChatId() {
         return chatId;
     }
 
