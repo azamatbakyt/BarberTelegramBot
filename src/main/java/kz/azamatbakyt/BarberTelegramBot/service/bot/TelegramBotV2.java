@@ -176,7 +176,7 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
     public void reminderSender(String chatId, String textToSend) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText(chatId);
+        message.setText(textToSend);
         try {
             execute(message);
         } catch (TelegramApiException e) {
