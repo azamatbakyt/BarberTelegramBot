@@ -161,10 +161,10 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
                 .toLocalDate();
         for (AppointmentTimeslot appointment : appointments) {
             boolean firstCondition = appointment.getAppointment().getDateOfBooking().isEqual(currentDate);
-            boolean secondCondition = currentTime.getHour() == appointment.getTimeslot().getStartTime().minusHours(2).getHour();
+            boolean secondCondition = currentTime.getHour() == appointment.getTimeslot().getStartTime().minusHours(1).getHour();
             if (firstCondition) {
                 if (secondCondition) {
-                    String textToSend = "Напоминаем что у вас сегодня в " + appointment.getTimeslot().getStartTime()
+                    String textToSend = "Напоминаем что у вас через час в " + appointment.getTimeslot().getStartTime()
                             + " часов стоит запись на услугу " + appointment.getAppointment().getService().getName() + "!";
                     reminderSender(String.valueOf(appointment.getAppointment().getClient().getChatId()), textToSend);
                 }
@@ -176,7 +176,7 @@ public class TelegramBotV2 extends TelegramLongPollingBot {
     public void reminderSender(String chatId, String textToSend) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText(chatId);
+        message.setText(textToSend);
         try {
             execute(message);
         } catch (TelegramApiException e) {
